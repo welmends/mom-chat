@@ -1,5 +1,6 @@
 package application;
 
+import application.ui.constants.ImageConstants;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -17,10 +18,10 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Parent root = FXMLLoader.load(getClass().getResource("scenes/main_scene.fxml"));
-		//primaryStage.getIcons().add(ImageConstants.MAIN_APPLICATION_ICON);
+		primaryStage.getIcons().add(ImageConstants.CHAT_TOP_ICON);
 		primaryStage.setTitle("MOM Chat");
 		primaryStage.setResizable(false);
-		primaryStage.setScene(new Scene(root, 720, 720));
+		primaryStage.setScene(new Scene(root, 700, 550));
 		primaryStage.show();
 		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
