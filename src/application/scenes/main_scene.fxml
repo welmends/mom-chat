@@ -14,9 +14,5 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></HBox>
-      <AnchorPane fx:id="loginAnchorPane" prefHeight="550.0" prefWidth="700.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></AnchorPane>
    </children>
 </AnchorPane>

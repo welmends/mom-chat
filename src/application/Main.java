@@ -23,20 +23,19 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
 		
-		Parent layout;
-		Scene scene;
+		Parent root;
 		FXMLLoader loader = new FXMLLoader();
 		MainController mainController = new MainController();
 		
 		loader.setLocation(getClass().getResource(FXMLConstants.FXML_MAIN_CONTROLLER));
 		mainController.setMainApp(this);
 		loader.setController(mainController);
-		layout = loader.load();
-        scene = new Scene(layout, 700, 550);
+		root = loader.load();
+		
         this.primaryStage.getIcons().add(ImageConstants.CHAT_TOP_ICON);
         this.primaryStage.setTitle("MOM Chat");
 		this.primaryStage.setResizable(false);
-		this.primaryStage.setScene(scene);
+		this.primaryStage.setScene(new Scene(root, 700, 550));
 		this.primaryStage.show();
 		this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		    @Override public void handle(WindowEvent t) {
