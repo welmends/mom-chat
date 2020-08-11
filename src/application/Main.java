@@ -1,5 +1,7 @@
 package application;
 
+import application.ui.MainController;
+import application.ui.constants.FXMLConstants;
 import application.ui.constants.ImageConstants;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,24 +13,40 @@ import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
 
 public class Main extends Application {
+	private Stage primaryStage;
+	
 	public static void main(String[] args) {  
 		launch(args);
 	}
-	 
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Parent root = FXMLLoader.load(getClass().getResource("scenes/main_scene.fxml"));
-		primaryStage.getIcons().add(ImageConstants.CHAT_TOP_ICON);
-		primaryStage.setTitle("MOM Chat");
-		primaryStage.setResizable(false);
-		primaryStage.setScene(new Scene(root, 700, 550));
-		primaryStage.show();
+		this.primaryStage = primaryStage;
 		
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		Parent layout;
+		Scene scene;
+		FXMLLoader loader = new FXMLLoader();
+		MainController mainController = new MainController();
+		
+		loader.setLocation(getClass().getResource(FXMLConstants.FXML_MAIN_CONTROLLER));
+		mainController.setMainApp(this);
+		loader.setController(mainController);
+		layout = loader.load();
+        scene = new Scene(layout, 700, 550);
+        this.primaryStage.getIcons().add(ImageConstants.CHAT_TOP_ICON);
+        this.primaryStage.setTitle("MOM Chat");
+		this.primaryStage.setResizable(false);
+		this.primaryStage.setScene(scene);
+		this.primaryStage.show();
+		this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		    @Override public void handle(WindowEvent t) {
 		        Platform.exit();
 		        System.exit(0);
 		    }
 		});
 	}
+	
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
 }

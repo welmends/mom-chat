@@ -58,6 +58,7 @@ public class ChatController extends Thread implements Initializable  {
 		// TextField Enter Key Pressed Behavior
 		setTextFieldKeyPressedBehavior();
 	}
+	
 	@Override
 	public void run() {
 		while(true) {
