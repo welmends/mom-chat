@@ -15,13 +15,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class PopupAuthController extends Thread implements Initializable {
+public class PopupAuthController implements Initializable {
 
 	// FXML Variables
     @FXML private TextField nicknameTF;
     @FXML private TextField ipaddressTF;
     @FXML private TextField portnumberTF;
-    @FXML private Button connectBtn;
+    @FXML private Button enterButton;
     
 	// COM Variables
     private MOM mom;
@@ -43,31 +43,11 @@ public class PopupAuthController extends Thread implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-    	setConnectBtnPressedBehavior();
+    	setEnterBtnPressedBehavior();
     }
-    
-	@Override
-	public void run() {
-		while(true) {
-			try {
-				Thread.sleep(PopupAuthConstants.THREAD_SLEEP_TIME_MILLIS);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if(p2p.has_connection()==true) {
-				break;
-			}
-		}
-		Platform.runLater(new Runnable() {
-		    @Override
-		    public void run() {
-		    	closeStage();
-		    }
-		});
-	}
 	
-    private void setConnectBtnPressedBehavior() {
-        connectBtn.setOnAction((event)->{
+    private void setEnterBtnPressedBehavior() {
+    	enterButton.setOnAction((event)->{
         	disableComponents(true);
         	acquireCredentials();
         	String nickname     = credentials.get(PopupAuthConstants.HASHCODE_NICKNAME);
@@ -81,28 +61,12 @@ public class PopupAuthController extends Thread implements Initializable {
         	// P2P Connection
         	p2p.setup(ip_address, port_number);
         	p2p.set_technology(P2PConstants.RMI);
-    		if(p2p.connect()==true) {
-    			if(p2p.is_client()) {
-    				closeStage();
-    			}else {
-    				//*** alertLoginInformation();
-	        		
-    				// Wait for connection
-    				p2p.thread_call();
-    				
-    				// Trigger for client connection
-    				start();
-    			}
-    		}else {
-    			//*** alertLoginError();
-    	        Platform.exit();
-    	        System.exit(0);
-    		}
+        	closeStage();
         });
     }
     
     private void disableComponents(Boolean b) {
-    	connectBtn.setDisable(b);
+    	enterButton.setDisable(b);
     	nicknameTF.setDisable(b);
     	ipaddressTF.setDisable(b);
     	portnumberTF.setDisable(b);

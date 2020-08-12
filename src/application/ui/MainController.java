@@ -25,17 +25,18 @@ public class MainController implements Initializable {
 	@FXML HBox mainHBox;
 	
 	// COM Variables
-	MOM mom;
-	P2P p2p;
+	private MOM mom;
+	private P2P p2p;
 	
 	// FXML Loaders
-	FXMLLoader contactsLoader;
-	FXMLLoader chatLoader;
+	private FXMLLoader contactsLoader;
+	private FXMLLoader chatLoader;
 	
 	// Controllers
-	ContactsController contactsController;
-	ChatController chatController;
+	private ContactsController contactsController;
+	private ChatController chatController;
 	
+	// Main Object
 	private Main main;
     public void setMainApp(Main main) {
         this.main = main;
@@ -76,7 +77,10 @@ public class MainController implements Initializable {
 		contactsController.loadFromParent(mom, p2p);
 		chatController.loadFromParent(mom, p2p);
 	}
-
+	
+	public void closeApplication() {
+		p2p.disconnect();
+	}
 
     private Boolean authentication() {
         Parent layout;

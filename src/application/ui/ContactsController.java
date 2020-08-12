@@ -5,7 +5,6 @@ import java.util.ResourceBundle;
 
 import application.com.P2P;
 import application.com.mom.MOM;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -24,9 +23,6 @@ public class ContactsController implements Initializable  {
 	private MOM mom;
 	private P2P p2p;
 	
-	// Variables
-	private Boolean is_connected;
-	
 	public void loadFromParent(MOM mom, P2P p2p) {
 		this.mom = mom;
 		this.p2p = p2p;
@@ -34,24 +30,23 @@ public class ContactsController implements Initializable  {
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		this.is_connected = true;
-		on_circle.setFill(javafx.scene.paint.Color.GREEN);
-		off_circle.setFill(javafx.scene.paint.Color.GRAY);
+		on_circle.setFill(javafx.scene.paint.Color.GRAY);
+		off_circle.setFill(javafx.scene.paint.Color.RED);
 		setPowerBtnPressedBehavior();
 	}
 	
 	private void setPowerBtnPressedBehavior() {
 		power_btn.setOnAction((event)->{
-        	if (is_connected) {
-        		this.is_connected = false;
-        		on_circle.setFill(javafx.scene.paint.Color.GRAY);
-        		off_circle.setFill(javafx.scene.paint.Color.RED);
-        		p2p.disconnect();
+        	if (p2p.has_connection()) {
+        		if(p2p.disconnect()) {
+            		on_circle.setFill(javafx.scene.paint.Color.GRAY);
+            		off_circle.setFill(javafx.scene.paint.Color.RED);
+        		}
         	} else {
-        		this.is_connected = true;
-        		on_circle.setFill(javafx.scene.paint.Color.GREEN);
-        		off_circle.setFill(javafx.scene.paint.Color.GRAY);
-        		p2p.connect();
+        		if(p2p.connect()) {
+        			on_circle.setFill(javafx.scene.paint.Color.GREEN);
+            		off_circle.setFill(javafx.scene.paint.Color.GRAY);
+        		}
         	}
         });
     }

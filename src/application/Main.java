@@ -39,6 +39,7 @@ public class Main extends Application {
 		this.primaryStage.show();
 		this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		    @Override public void handle(WindowEvent t) {
+		    	mainController.closeApplication();
 		        Platform.exit();
 		        System.exit(0);
 		    }
