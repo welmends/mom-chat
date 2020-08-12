@@ -73,7 +73,7 @@ public class ChatController extends Thread implements Initializable  {
 				e.printStackTrace();
 			}
 			
-			if(p2p.is_connected() && p2p.was_retrieved()) {
+			if(p2p.is_connected() && p2p.was_retrieved()==false) {
 				p2p.set_retrieve_status(true);
             	// Receive enqueued messages from MOM
 				List<String> queue = mom.receiveQueue();
@@ -89,18 +89,6 @@ public class ChatController extends Thread implements Initializable  {
 				});
 			}
 			else if(p2p.chat_stack_full()) {
-            	// Receive enqueued messages from MOM
-				List<String> queue = mom.receiveQueue();
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-				        // Receive Locally
-						for (int i=0; i<queue.size(); i++) {
-							updateChatOnReceive(queue.get(i));
-						}
-						queue.clear();
-					}
-				});
 				// Receive Remote 
 				String message_received = p2p.get_chat_msg();
 				
