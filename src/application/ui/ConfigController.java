@@ -1,7 +1,10 @@
 package application.ui;
 
+import java.awt.Insets;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import org.apache.activemq.store.jdbc.adapter.BlobJDBCAdapter;
 
 import application.com.P2P;
 import application.com.mom.MOM;
@@ -10,12 +13,16 @@ import application.ui.constants.ConfigConstants;
 import application.ui.constants.ImageConstants;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -56,8 +63,8 @@ public class ConfigController extends Thread implements Initializable  {
 	}
 	
 	private void setupComponents() {
-		on_circle.setFill(javafx.scene.paint.Color.GRAY);
-		off_circle.setFill(javafx.scene.paint.Color.RED);
+		on_circle.setFill(ConfigConstants.COLOR_UNKNOWN);
+		off_circle.setFill(ConfigConstants.COLOR_OFFLINE);
 		
 		add_btn.setGraphic(ImageConstants.ADD_BTN_ICON);
 		power_btn.setGraphic(ImageConstants.POWER_BTN_ICON);
@@ -65,10 +72,25 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	private void setAddBtnPressedBehavior() {
 		add_btn.setOnAction((event)->{
-	        Label txt = new Label(add_tf.getText());
-	        StackPane sp = new StackPane();
-	        sp.getChildren().add(txt);
-	        contactsVBoxOnScroll.getChildren().addAll(sp);
+			HBox h = new HBox();
+			VBox v = new VBox();
+			Button b = new Button();
+			Circle c = new Circle();
+			
+			h.setPadding(ConfigConstants.PADDING_CONTACT_HBOX);
+			b.setText(add_tf.getText());
+			b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
+			c.setRadius(ConfigConstants.CICLE_STATUS_RADIUS);
+			c.setStrokeWidth(ConfigConstants.CICLE_STATUS_STROKE);
+			c.setStroke(ConfigConstants.COLOR_STROKE);
+			c.setFill(ConfigConstants.COLOR_UNKNOWN);
+			
+			v.getChildren().add(c);
+			v.setPadding(ConfigConstants.PADDING_CONTACT_VBOX);
+			
+			h.getChildren().addAll(b, v);
+
+	        contactsVBoxOnScroll.getChildren().addAll(h);
 	        contactsVBoxOnScroll.applyCss();
 	        contactsVBoxOnScroll.layout();
         });
@@ -78,13 +100,13 @@ public class ConfigController extends Thread implements Initializable  {
 		power_btn.setOnAction((event)->{
         	if (p2p.is_active()) {
         		if(p2p.disconnect()) {
-            		on_circle.setFill(javafx.scene.paint.Color.GRAY);
-            		off_circle.setFill(javafx.scene.paint.Color.RED);
+            		on_circle.setFill(ConfigConstants.COLOR_UNKNOWN);
+            		off_circle.setFill(ConfigConstants.COLOR_OFFLINE);
         		}
         	} else {
         		if(p2p.connect()) {
-        			on_circle.setFill(javafx.scene.paint.Color.GREEN);
-            		off_circle.setFill(javafx.scene.paint.Color.GRAY);
+        			on_circle.setFill(ConfigConstants.COLOR_ONLINE);
+            		off_circle.setFill(ConfigConstants.COLOR_UNKNOWN);
         		}
         	}
         });
