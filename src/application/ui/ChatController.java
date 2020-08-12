@@ -8,7 +8,6 @@ import java.util.ResourceBundle;
 import application.com.P2P;
 import application.com.mom.MOM;
 import application.ui.constants.ChatConstants;
-import application.ui.constants.FontConstants;
 import application.ui.constants.ImageConstants;
 import application.ui.utils.SoundUtils;
 import javafx.application.Platform;
@@ -31,7 +30,7 @@ public class ChatController extends Thread implements Initializable  {
 	
 	// FXML Variables
 	@FXML VBox chatVBox;
-	@FXML Label chatLabel;
+	@FXML Label chatLabel; //*** USE THIS TO SHOW THE CONTACT NAME
 	@FXML ImageView chatImageView;
 	@FXML ScrollPane chatScrollPane;
 	@FXML VBox chatVBoxOnScroll;
@@ -121,9 +120,6 @@ public class ChatController extends Thread implements Initializable  {
 	}
 	
 	private void setupComponents() {
-		chatLabel.setText(ChatConstants.TEXT_LABEL_CHAT);
-		chatLabel.setFont(FontConstants.sixty26p);
-		
 		chatImageView.setImage(ImageConstants.CHAT_TOP_ICON);
 		
 		chatScrollPane.setStyle(ChatConstants.STYLE_SCROLL_PANE_CHAT);

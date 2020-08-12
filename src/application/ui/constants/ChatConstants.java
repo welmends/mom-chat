@@ -8,9 +8,6 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.TextAlignment;
 
 public class ChatConstants {
-	// Label
-	public static String TEXT_LABEL_CHAT = "C H A T";
-	
 	// Components Style
 	public static String STYLE_SCROLL_PANE_CHAT = "-fx-background-color:#d8e2eb; -fx-background-radius: 10 10 10 10; -fx-border-color: #7894ac; -fx-border-width: 3; -fx-border-radius: 10 10 10 10;";
 	public static String STYLE_VBOX_CHAT = "-fx-background-color:#d8e2eb;";
