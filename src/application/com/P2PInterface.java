@@ -23,20 +23,12 @@ public interface P2PInterface {
 	public Boolean is_client();
 	public Boolean has_connection();
 	
-	// Bizingo Stack Full
+	// Chat Stack Full
 	public Boolean chat_stack_full();
-	public Boolean game_stack_full();
-	public Boolean sys_stack_full();
 	
-	// Bizingo Getters
+	// Chat Getter
 	public String get_chat_msg();
-	public String get_game_mov();
-	public String get_sys_cmd();
 	
 	// Calls
 	public void send_chat_msg_call(String msg);
-	public void move_game_piece_call(String mov);
-	public void sys_restart_request_call();
-	public void sys_restart_response_ok_call();
-	public void sys_restart_response_fail_call();
 }

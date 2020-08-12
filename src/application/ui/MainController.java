@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import application.Main;
 import application.com.P2P;
+import application.com.mom.MOM;
 import application.ui.constants.FXMLConstants;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,10 +24,8 @@ public class MainController implements Initializable {
 	@FXML AnchorPane root;
 	@FXML HBox mainHBox;
 	
-	// Main
-	private Main main;
-	
-	// P2P (Socket or RMI)
+	// COM Variables
+	MOM mom;
 	P2P p2p;
 	
 	// FXML Loaders
@@ -37,6 +36,7 @@ public class MainController implements Initializable {
 	ContactsController contactsController;
 	ChatController chatController;
 	
+	private Main main;
     public void setMainApp(Main main) {
         this.main = main;
     }
@@ -44,6 +44,7 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
+		mom = new MOM();
 		p2p = new P2P();
 		
 		Scene contactsScene = null;
@@ -72,8 +73,8 @@ public class MainController implements Initializable {
 		authentication();
 		
 		// Load common objects from parent
-		contactsController.loadFromParent(p2p);
-		chatController.loadFromParent(p2p);
+		contactsController.loadFromParent(mom, p2p);
+		chatController.loadFromParent(mom, p2p);
 	}
 
 
@@ -82,7 +83,7 @@ public class MainController implements Initializable {
         Scene scene;
         Stage popupStage;
         FXMLLoader loader = new FXMLLoader();
-        PopupAuthController popupController = new PopupAuthController(p2p, contactsController, chatController);
+        PopupAuthController popupController = new PopupAuthController(mom, p2p, contactsController, chatController);
         
         loader.setLocation(getClass().getResource(FXMLConstants.FXML_POPUP_AUTH_CONTROLLER));
         loader.setController(popupController);

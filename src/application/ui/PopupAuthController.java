@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import application.com.P2P;
 import application.com.P2PConstants;
+import application.com.mom.MOM;
 import application.ui.constants.PopupAuthConstants;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -22,7 +23,8 @@ public class PopupAuthController extends Thread implements Initializable {
     @FXML private TextField portnumberTF;
     @FXML private Button connectBtn;
     
-	// P2P (Socket or RMI)
+	// COM Variables
+    private MOM mom;
 	private P2P p2p;
 	
 	// Variables
@@ -32,7 +34,8 @@ public class PopupAuthController extends Thread implements Initializable {
     private ContactsController contacts;
     private ChatController chat;
     
-    public PopupAuthController(P2P p2p, ContactsController contacts, ChatController chat) {
+    public PopupAuthController(MOM mom, P2P p2p, ContactsController contacts, ChatController chat) {
+    	this.mom = mom;
     	this.p2p = p2p;
     	this.contacts = contacts;
     	this.chat = chat;
@@ -67,13 +70,17 @@ public class PopupAuthController extends Thread implements Initializable {
         connectBtn.setOnAction((event)->{
         	disableComponents(true);
         	acquireCredentials();
-        	//credentials.get(PopupAuthConstants.HASHCODE_NICKNAME);
-        	String ip_address = credentials.get(PopupAuthConstants.HASHCODE_IPADDRESS);
+        	String nickname     = credentials.get(PopupAuthConstants.HASHCODE_NICKNAME);
+        	String ip_address   = credentials.get(PopupAuthConstants.HASHCODE_IPADDRESS);
         	Integer port_number = Integer.valueOf(credentials.get(PopupAuthConstants.HASHCODE_PORTNUMBER));
+        	String mom_url      = "tcp://"+ip_address+":61616";
+        	
+        	// MOM Connection
+        	mom.setup(mom_url, nickname);
         	
         	// P2P Connection
         	p2p.setup(ip_address, port_number);
-        	p2p.set_technology(P2PConstants.SOCKET);
+        	p2p.set_technology(P2PConstants.RMI);
     		if(p2p.connect()==true) {
     			if(p2p.is_client()) {
     				closeStage();

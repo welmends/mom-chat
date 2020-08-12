@@ -17,10 +17,10 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	
     private String server_link, client_link;
     
-    private String chat_msg, game_mov, sys_cmd;
-    private Boolean chat_stack_full, game_stack_full, sys_stack_full;
+    private String chat_msg;
+    private Boolean chat_stack_full;
     
-    private Boolean is_connected;
+    private Boolean is_active, is_connected;
     private String peer_type;
     private String ip, local_ip;
     private int port;
@@ -34,9 +34,8 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		this.client_link = "";
 		
 		this.chat_stack_full = false;
-		this.game_stack_full = false;
-		this.sys_stack_full = false;
 		
+		this.is_active = false;
 		this.is_connected = false;
 		this.peer_type = "";
 		this.ip = "";
@@ -72,7 +71,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public Boolean connect() {
         try {
-        	server_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+P2PConstants.BIZINGO_RMI_SERVER_NAME;
+        	server_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_SERVER_NAME;
         	int length = Naming.list(server_link).length;
         	if(length==0) {
     			peer_type = "server";
@@ -81,8 +80,8 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     		}
         	else if(length==1) {
         		peer_type = "client";
-    			server_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+P2PConstants.BIZINGO_RMI_CLIENT_NAME;
-    			client_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+P2PConstants.BIZINGO_RMI_SERVER_NAME;
+    			server_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_CLIENT_NAME;
+    			client_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_SERVER_NAME;
     			bind();
     			lookup();
     			RMIP2P.rmi_client.call_server_lookup(local_ip);
@@ -91,6 +90,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     			return false;
     		}
         } catch(Exception e){
+        	System.out.println("[rmi][connect method]");
         	System.out.println(e);
         	return false;
         }
@@ -99,13 +99,16 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public Boolean disconnect() {
 		try {
+			is_active = false;
 			is_connected = false;
 			unbind();
 			RMIP2P.rmi_client.call_peer_disconnect();
+			return true;
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			System.out.println("[rmi][disconnect method]");
+			System.out.println(e);
+			return false;
 		}
-		return false;
 	}
 	
 	// P2P Interface Implementation - Thread
@@ -119,11 +122,24 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		try {
             while(true){
             	Thread.sleep(P2PConstants.THREAD_SLEEP_TIME_MILLIS);
-            	RMIP2P.rmi_client.call_peer_test_connection();
+            	mutex.acquire();
+            	if(is_active == false) {
+            		mutex.release();
+            		return;
+            	}
+            	else if(is_connected == false) {
+            		mutex.release();
+            		throw new Exception("peer disconnected");
+            	}
+            	else {
+            		mutex.release();
+            		RMIP2P.rmi_client.call_peer_test_connection();
+            	}
             }
         } catch(Exception e) {
+        	System.out.println("[rmi][run method]");
             System.out.println(e);
-            is_connected = false;
+            connect();
         }
     }
 		
@@ -164,110 +180,44 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     	return is_connected;
     }
     
-    // P2P Interface Implementation - Bizingo Stack Full
+    // P2P Interface Implementation - Chat Stack Full
 	@Override
     public Boolean chat_stack_full() {
     	Boolean stack_full = false;
+		if(is_connected==false) {
+			return stack_full;
+		}
 		try {
 			mutex.acquire();
 			stack_full = chat_stack_full;
 			if(stack_full == true) { chat_stack_full = false; }
 	    	mutex.release();
 		} catch (Exception e) {
+			System.out.println("[rmi][chat_stack_full method]");
 			System.out.println(e);
 		}
     	return stack_full;
     }
-    
-	@Override
-    public Boolean game_stack_full() {
-    	Boolean stack_full = false;
-		try {
-			mutex.acquire();
-			stack_full = game_stack_full;
-			if(stack_full == true) { game_stack_full = false; }
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-    	return stack_full;
-    }
-    
-	@Override
-    public Boolean sys_stack_full() {
-    	Boolean stack_full = false;
-		try {
-			mutex.acquire();
-			stack_full = sys_stack_full;
-			if(stack_full == true) { sys_stack_full = false; }
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-    	return stack_full;
-    }
-    
-	// P2P Interface Implementation - Bizingo Getters
+	
+	// P2P Interface Implementation - Chat Getter
 	@Override
 	public String get_chat_msg() {
 		return chat_msg;
 	}
 	
-	@Override
-	public String get_game_mov() {
-		return game_mov;
-	}
-	
-	@Override
-	public String get_sys_cmd() {
-		return sys_cmd;
-	}
-	
 	// P2P Interface Implementation - Calls
 	@Override
 	public void send_chat_msg_call(String msg) {
+		if(is_connected==false) {
+			return;
+		}
 		try {
 			RMIP2P.rmi_client.send_chat_msg(msg);
 		} catch (RemoteException e) {
+			System.out.println("[rmi][send_chat_msg_call method]");
 			System.out.println(e);
 		}
     }
-	
-	@Override
-	public void move_game_piece_call(String mov) {
-		try {
-			RMIP2P.rmi_client.move_game_piece(mov);
-		} catch (RemoteException e) {
-			System.out.println(e);
-		}
-	}
-	
-	@Override
-	public void sys_restart_request_call() {
-		try {
-			RMIP2P.rmi_client.sys_restart_request();
-		} catch (RemoteException e) {
-			System.out.println(e);
-		}
-	}
-	
-	@Override
-	public void sys_restart_response_ok_call() {
-		try {
-			RMIP2P.rmi_client.sys_restart_response_ok();
-		} catch (RemoteException e) {
-			System.out.println(e);
-		}
-	}
-	
-	@Override
-	public void sys_restart_response_fail_call() {
-		try {
-			RMIP2P.rmi_client.sys_restart_response_fail();
-		} catch (RemoteException e) {
-			System.out.println(e);
-		}
-	}
 	
 	// RMI Interface Implementation
 	@Override
@@ -278,62 +228,15 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 			chat_stack_full = true;
 	    	mutex.release();
 		} catch (Exception e) {
+			System.out.println("[rmi][send_chat_msg method]");
 			System.out.println(e);
 		}
     }
-	
-	@Override
-	public void move_game_piece(String mov) {
-		game_mov = mov;
-		try {
-			mutex.acquire();
-			game_stack_full = true;
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-    }
-	
-	@Override
-	public void sys_restart_request() {
-		sys_cmd = P2PConstants.SYS_RESTART_REQUEST;
-		try {
-			mutex.acquire();
-			sys_stack_full = true;
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-	
-	@Override
-	public void sys_restart_response_ok() {
-		sys_cmd = P2PConstants.SYS_RESTART_RESPONSE_OK;
-		try {
-			mutex.acquire();
-			sys_stack_full = true;
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-	
-	@Override
-	public void sys_restart_response_fail() {
-		sys_cmd = P2PConstants.SYS_RESTART_RESPONSE_FAIL;
-		try {
-			mutex.acquire();
-			sys_stack_full = true;
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
 	
 	@Override
 	public void call_server_lookup(String client_ip) {
 		local_ip = client_ip;
-		client_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+P2PConstants.BIZINGO_RMI_CLIENT_NAME;
+		client_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_CLIENT_NAME;
 		lookup();
 	}
 	
@@ -353,6 +256,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 			Naming.bind(server_link, this);
 			return true;
 		} catch(Exception e){
+			System.out.println("[rmi][bind method]");
 			System.out.println(e);
 			return false;
 		}
@@ -363,6 +267,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 			Naming.unbind(server_link);
 			return true;
 		} catch(Exception e){
+			System.out.println("[rmi][unbind method]");
 			System.out.println(e);
 			return false;
 		}
@@ -371,10 +276,12 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	private Boolean lookup() {
 		try {
 			rmi_client = (RMIP2PInterface)Naming.lookup(client_link);
+			is_active = true;
 			is_connected = true;
 			new Thread(this).start();
 			return true;
 		} catch(Exception e){
+			System.out.println("[rmi][lookup method]");
 			System.out.println(e);
 			return false;
 		}

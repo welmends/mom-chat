@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 import application.com.P2P;
+import application.com.mom.MOM;
 import application.ui.constants.ChatConstants;
 import application.ui.constants.FontConstants;
 import application.ui.constants.ImageConstants;
@@ -36,19 +37,23 @@ public class ChatController extends Thread implements Initializable  {
 	@FXML VBox chatVBoxOnScroll;
 	@FXML TextField chatTextField;
 	
-	// P2P (Socket or RMI)
-	P2P p2p;
+	// COM Variables
+	private MOM mom;
+	private P2P p2p;
 	
 	// Variables
-	SoundUtils soundUtils;
+	private SoundUtils soundUtils;
 	
-	public void loadFromParent(P2P p2p) {
+	public void loadFromParent(MOM mom, P2P p2p) {
+		this.mom = mom;
 		this.p2p = p2p;
-		soundUtils = new SoundUtils();
 	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		// Initialize Objects
+		this.soundUtils = new SoundUtils();
+		
 		// Setup components
 		setupComponents();
 		
@@ -70,7 +75,7 @@ public class ChatController extends Thread implements Initializable  {
 			if(p2p.chat_stack_full()) {
             	// Receive Messages
 				
-				// Receive Remote
+				// Receive Remote 
 				String message_received = p2p.get_chat_msg();
 				
 				Platform.runLater(new Runnable() {
@@ -166,6 +171,11 @@ public class ChatController extends Thread implements Initializable  {
 	                
 	                // Send Remote
 	                p2p.send_chat_msg_call(chatTextField.getText());
+	                if (mom.getNickname().equals("a")) {
+	                	mom.send("b", chatTextField.getText());
+	                }else {
+	                	mom.send("a", chatTextField.getText());
+	                }
 	                
 	                chatTextField.setText("");
 	            }

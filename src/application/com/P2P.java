@@ -6,9 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Enumeration;
 
-import application.com.P2PConstants;
+//import application.com.P2PConstants;
 import application.com.rmi.RMIP2P;
-import application.com.socket.SocketP2P;
 
 public class P2P implements P2PInterface {
 	
@@ -66,10 +65,6 @@ public class P2P implements P2PInterface {
 	@Override
 	public Boolean connect() {
 		switch (this.get_technology_name()) {
-		case P2PConstants.SOCKET:
-			this.technology = new SocketP2P();
-			this.technology.setup(ip, port);
-			return this.technology.connect();
 		case P2PConstants.RMI:
 			//Create RMI Registry
 			String local_ip_address = this.findLocalIpAddressFromNetworkInterfaces();
@@ -208,7 +203,7 @@ public class P2P implements P2PInterface {
 		}
 	}
 
-    // P2P Interface Implementation - Bizingo Stack Full
+    // P2P Interface Implementation - Chat Stack Full
 	@Override
 	public Boolean chat_stack_full() {
 		if(technology!=null) {
@@ -218,47 +213,11 @@ public class P2P implements P2PInterface {
 		}
 	}
 
-	@Override
-	public Boolean game_stack_full() {
-		if(technology!=null) {
-			return this.technology.game_stack_full();
-		}else {
-			return false;
-		}
-	}
-
-	@Override
-	public Boolean sys_stack_full() {
-		if(technology!=null) {
-			return this.technology.sys_stack_full();
-		}else {
-			return false;
-		}
-	}
-
-	// P2P Interface Implementation - Bizingo Getters
+	// P2P Interface Implementation - Chat Getter
 	@Override
 	public String get_chat_msg() {
 		if(technology!=null) {
 			return this.technology.get_chat_msg();
-		}else {
-			return "";
-		}
-	}
-
-	@Override
-	public String get_game_mov() {
-		if(technology!=null) {
-			return this.technology.get_game_mov();
-		}else {
-			return "";
-		}
-	}
-
-	@Override
-	public String get_sys_cmd() {
-		if(technology!=null) {
-			return this.technology.get_sys_cmd();
 		}else {
 			return "";
 		}
@@ -269,34 +228,6 @@ public class P2P implements P2PInterface {
 	public void send_chat_msg_call(String msg) {
 		if(technology!=null) {
 			this.technology.send_chat_msg_call(msg);
-		}
-	}
-
-	@Override
-	public void move_game_piece_call(String mov) {
-		if(technology!=null) {
-			this.technology.move_game_piece_call(mov);
-		}
-	}
-
-	@Override
-	public void sys_restart_request_call() {
-		if(technology!=null) {
-			this.technology.sys_restart_request_call();
-		}
-	}
-
-	@Override
-	public void sys_restart_response_ok_call() {
-		if(technology!=null) {
-			this.technology.sys_restart_response_ok_call();
-		}
-	}
-
-	@Override
-	public void sys_restart_response_fail_call() {
-		if(technology!=null) {
-			this.technology.sys_restart_response_fail_call();
 		}
 	}
 	
