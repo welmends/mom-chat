@@ -23,6 +23,12 @@ public interface P2PInterface {
 	public Boolean is_client();
 	public Boolean is_active();
 	public Boolean is_connected();
+	public Boolean was_retrieved();
+	
+	// Setters
+	public void set_active_status(Boolean status);
+	public void set_connect_status(Boolean status);
+	public void set_retrieve_status(Boolean status);
 	
 	// Chat Stack Full
 	public Boolean chat_stack_full();

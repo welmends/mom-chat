@@ -211,7 +211,35 @@ public class P2P implements P2PInterface {
 			return false;
 		}
 	}
+	
+	@Override
+	public Boolean was_retrieved() {
+		if(technology!=null) {
+			return this.technology.was_retrieved();
+		}else {
+			return false;
+		}
+	}
 
+ 	// P2P Interface Implementation - Setters
+	public void set_active_status(Boolean status) {
+		if(technology!=null) {
+			this.technology.set_active_status(status);
+		}
+	}
+	
+	public void set_connect_status(Boolean status) {
+		if(technology!=null) {
+			this.technology.set_connect_status(status);
+		}
+	}
+	
+	public void set_retrieve_status(Boolean status) {
+		if(technology!=null) {
+			this.technology.set_retrieve_status(status);
+		}
+	}
+	
     // P2P Interface Implementation - Chat Stack Full
 	@Override
 	public Boolean chat_stack_full() {

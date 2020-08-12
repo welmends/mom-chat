@@ -20,7 +20,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     private String chat_msg;
     private Boolean chat_stack_full;
     
-    private Boolean active_status, connect_status;
+    private Boolean active_status, connect_status, retrieve_status;
     private String peer_type;
     private String ip, local_ip;
     private int port;
@@ -38,6 +38,8 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		
 		this.active_status = false;
 		this.connect_status = false;
+		this.retrieve_status = false;
+		
 		this.peer_type = "";
 		this.ip = "";
 		this.local_ip = "";
@@ -104,6 +106,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 			Boolean status = is_connected();
 			set_active_status(false);
 			set_connect_status(false);
+			set_retrieve_status(false);
 			unbind();
 			if(status) {
 				RMIP2P.rmi_client.call_peer_disconnect();
@@ -206,24 +209,54 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		}
     }
 	
+	@Override
+    public Boolean was_retrieved() {
+		Boolean status = false;
+		try {
+			status_mutex.acquire();
+			status = retrieve_status;
+			status_mutex.release();
+			return status;
+		} catch (Exception e) {
+			System.out.println("[rmi][was_retrieved method]");
+			System.out.println(e);
+			return false;
+		}
+    }
+	
+ 	// P2P Interface Implementation - Setters
+	@Override
 	public void set_active_status(Boolean status) {
 		try {
 			status_mutex.acquire();
 			active_status = status;
 			status_mutex.release();
 		} catch (Exception e) {
-			System.out.println("[rmi][set_active method]");
+			System.out.println("[rmi][set_active_status method]");
 			System.out.println(e);
 		}
 	}
 	
+	@Override
 	public void set_connect_status(Boolean status) {
 		try {
 			status_mutex.acquire();
 			connect_status = status;
 			status_mutex.release();
 		} catch (Exception e) {
-			System.out.println("[rmi][set_active method]");
+			System.out.println("[rmi][set_connect_status method]");
+			System.out.println(e);
+		}
+	}
+	
+	@Override
+	public void set_retrieve_status(Boolean status) {
+		try {
+			status_mutex.acquire();
+			retrieve_status = status;
+			status_mutex.release();
+		} catch (Exception e) {
+			System.out.println("[rmi][set_retrieve_status method]");
 			System.out.println(e);
 		}
 	}

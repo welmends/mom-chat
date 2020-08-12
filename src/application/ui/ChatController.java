@@ -3,6 +3,7 @@ package application.ui;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import application.com.P2P;
@@ -71,9 +72,35 @@ public class ChatController extends Thread implements Initializable  {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(p2p.chat_stack_full()) {
-            	// Receive Messages
-				
+			
+			if(p2p.is_connected() && p2p.was_retrieved()) {
+				p2p.set_retrieve_status(true);
+            	// Receive enqueued messages from MOM
+				List<String> queue = mom.receiveQueue();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+				        // Receive Locally
+						for (int i=0; i<queue.size(); i++) {
+							updateChatOnReceive(queue.get(i));
+						}
+						queue.clear();
+					}
+				});
+			}
+			else if(p2p.chat_stack_full()) {
+            	// Receive enqueued messages from MOM
+				List<String> queue = mom.receiveQueue();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+				        // Receive Locally
+						for (int i=0; i<queue.size(); i++) {
+							updateChatOnReceive(queue.get(i));
+						}
+						queue.clear();
+					}
+				});
 				// Receive Remote 
 				String message_received = p2p.get_chat_msg();
 				
@@ -122,12 +149,15 @@ public class ChatController extends Thread implements Initializable  {
 	            	updateChatOnSend(message_send);
 	            	
 	                // Send Remotely
-	                p2p.send_chat_msg_call(message_send);
-	                if (mom.getNickname().equals("a")) {
-	                	mom.send("b", message_send);
-	                }else {
-	                	mom.send("a", message_send);
-	                }
+	            	if (p2p.is_connected()) {
+	            		p2p.send_chat_msg_call(message_send);
+	            	} else {
+		                if (mom.getNickname().equals("a")) {
+		                	mom.send("b", message_send);
+		                } else {
+		                	mom.send("a", message_send);
+		                }
+	            	}
 	            }
 	        }
 	        

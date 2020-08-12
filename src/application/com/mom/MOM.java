@@ -1,9 +1,13 @@
 package application.com.mom;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
@@ -23,6 +27,7 @@ public class MOM {
 	private Destination destination;
 	private MessageConsumer consumer;
 	private MessageProducer producer;
+	private Message message;
 	private TextMessage text_message;
 	
 	public MOM() {
@@ -63,9 +68,10 @@ public class MOM {
 			this.producer = session.createProducer(this.destination);
 			this.text_message = this.session.createTextMessage(msg);
 			this.producer.send(this.text_message);
+			this.producer.close();
 			close_connection();
 		} catch (JMSException e) {
-			e.printStackTrace();
+			System.out.println(e);
 		}
 	}
 	
@@ -78,11 +84,37 @@ public class MOM {
 			this.consumer = this.session.createConsumer(this.destination);
 			this.text_message = (TextMessage) this.consumer.receiveNoWait();
 			String msg = this.text_message.getText();
+			this.consumer.close();
 			close_connection();
 			return msg;
 		} catch (JMSException e) {
-			e.printStackTrace();
-			return "err:-1";
+			System.out.println(e);
+			return "err:-2";
+		}
+	}
+	
+	public List<String> receiveQueue() {
+		List<String> queue = new ArrayList<String>();
+		if (this.set != true) {
+			return queue;
+		}
+		try {
+			open_connection(this.url, this.nickname);
+			this.consumer = this.session.createConsumer(this.destination);
+			while(true) {
+				this.message = this.consumer.receive(MOMConstants.RECEIVE_TIMEOUT_MILLIS);
+				if (this.message==null) {
+					break;
+				}
+				this.text_message = (TextMessage) this.message;
+				queue.add(this.text_message.getText());
+			}
+			this.consumer.close();
+			close_connection();
+			return queue;
+		} catch (JMSException e) {
+			System.out.println(e);
+			return queue;
 		}
 	}
 	
@@ -97,7 +129,6 @@ public class MOM {
 	}
 	
 	private void close_connection() throws JMSException {
-		this.producer.close();
 		this.session.close();
 		this.connection.close();
 	}
