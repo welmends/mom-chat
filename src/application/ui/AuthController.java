@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 import application.com.P2P;
 import application.com.P2PConstants;
 import application.com.mom.MOM;
-import application.ui.constants.PopupAuthConstants;
+import application.ui.constants.AuthConstants;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -61,9 +61,9 @@ public class AuthController implements Initializable {
     	enterButton.setOnAction((event)->{
         	disableComponents(true);
         	acquireCredentials();
-        	String nickname     = credentials.get(PopupAuthConstants.HASHCODE_NICKNAME);
-        	String ip_address   = credentials.get(PopupAuthConstants.HASHCODE_IPADDRESS);
-        	Integer port_number = Integer.valueOf(credentials.get(PopupAuthConstants.HASHCODE_PORTNUMBER));
+        	String nickname     = credentials.get(AuthConstants.HASHCODE_NICKNAME);
+        	String ip_address   = credentials.get(AuthConstants.HASHCODE_IPADDRESS);
+        	Integer port_number = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER));
         	String mom_url      = "tcp://"+ip_address+":61616";
         	
         	// MOM Connection
@@ -86,19 +86,19 @@ public class AuthController implements Initializable {
     private void acquireCredentials() {
     	credentials.clear();
     	if(nicknameTF.getText().equals("")) {
-    		credentials.put(PopupAuthConstants.HASHCODE_NICKNAME, PopupAuthConstants.DEFAULT_NICKNAME);
+    		credentials.put(AuthConstants.HASHCODE_NICKNAME, AuthConstants.DEFAULT_NICKNAME);
     	}else {
-    		credentials.put(PopupAuthConstants.HASHCODE_NICKNAME, nicknameTF.getText());
+    		credentials.put(AuthConstants.HASHCODE_NICKNAME, nicknameTF.getText());
     	}
     	if(ipaddressTF.getText().equals("")) {
-    		credentials.put(PopupAuthConstants.HASHCODE_IPADDRESS, PopupAuthConstants.DEFAULT_IPADDRESS);
+    		credentials.put(AuthConstants.HASHCODE_IPADDRESS, AuthConstants.DEFAULT_IPADDRESS);
     	}else {
-    		credentials.put(PopupAuthConstants.HASHCODE_IPADDRESS, ipaddressTF.getText());
+    		credentials.put(AuthConstants.HASHCODE_IPADDRESS, ipaddressTF.getText());
     	}
     	if(portnumberTF.getText().equals("")) {
-    		credentials.put(PopupAuthConstants.HASHCODE_PORTNUMBER, PopupAuthConstants.DEFAULT_PORTNUMBER);
+    		credentials.put(AuthConstants.HASHCODE_PORTNUMBER, AuthConstants.DEFAULT_PORTNUMBER);
     	}else {
-    		credentials.put(PopupAuthConstants.HASHCODE_PORTNUMBER, portnumberTF.getText());
+    		credentials.put(AuthConstants.HASHCODE_PORTNUMBER, portnumberTF.getText());
     	}
     	return;
     }

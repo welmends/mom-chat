@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import application.com.P2P;
 import application.com.mom.MOM;
+import application.ui.constants.ImageConstants;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -30,14 +31,20 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		on_circle.setFill(javafx.scene.paint.Color.GRAY);
-		off_circle.setFill(javafx.scene.paint.Color.RED);
+		setupComponents();
 		setPowerBtnPressedBehavior();
 	}
 	
 	@Override
 	public void run() {
 		return;
+	}
+	
+	private void setupComponents() {
+		on_circle.setFill(javafx.scene.paint.Color.GRAY);
+		off_circle.setFill(javafx.scene.paint.Color.RED);
+		
+		power_btn.setGraphic(ImageConstants.POWER_BTN_ICON);
 	}
 	
 	private void setPowerBtnPressedBehavior() {
