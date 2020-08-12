@@ -80,39 +80,8 @@ public class ChatController extends Thread implements Initializable  {
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
-				        Label txt = new Label("");
-				        txt.setText(message_received+ChatConstants.SPACE_FOR_LABEL_TIME);
-				        txt.setWrapText(true);
-				        txt.setTextFill(ChatConstants.COLOR_LABEL_TEXT_RECEIVE);
-				        txt.setStyle(ChatConstants.STYLE_LABEL_TEXT_RECEIVE);
-				        txt.setPadding(ChatConstants.PADDING_LABEL_TEXT_RECEIVE);
-				        txt.setAlignment(ChatConstants.ALIGNMENT_LABEL_TEXT_RECEIVE);
-		            	
-				        Label time = new Label(new SimpleDateFormat(ChatConstants.LABEL_TIME_SIMPLE_DATE_FORMAT).format(new Date()));
-				        time.setFont(ChatConstants.LABEL_TIME_FONT);
-				        time.setPadding(ChatConstants.PADDING_LABEL_TIME);
-				        time.setTextAlignment(ChatConstants.TEXT_ALIGNMENT_LABEL_TIME);
-				        
-				        StackPane sp = new StackPane();
-				        sp.setPadding(ChatConstants.PADDING_STACK_PANE_RECEIVE);
-				        sp.getChildren().add(txt);
-				        sp.getChildren().add(time);
-				        StackPane.setAlignment(txt, ChatConstants.ALIGNMENT_STACK_PANE_RECEIVE);
-				        StackPane.setAlignment(time, ChatConstants.ALIGNMENT_STACK_PANE_LABEL_TIME);
-				        
-				        // Receive Local
-				        soundUtils.playReceiveSound();
-						chatVBoxOnScroll.getChildren().addAll(sp);
-						
-						// Find the width and height of the component before the Stage has been shown
-						chatVBoxOnScroll.applyCss();
-						chatVBoxOnScroll.layout();
-		                
-		                // Limit the component height
-		                sp.setMinHeight(sp.getHeight());
-		                
-		                // Adjust width of time label through padding
-		                time.setPadding(new Insets(0,sp.getWidth()-txt.getWidth()+6,2,0));
+				        // Receive Locally
+						updateChatOnReceive(message_received);
 					}
 				});
 			}
@@ -125,59 +94,6 @@ public class ChatController extends Thread implements Initializable  {
 		chatScrollPane.setStyle(ChatConstants.STYLE_SCROLL_PANE_CHAT);
 		
 		chatVBoxOnScroll.setStyle(ChatConstants.STYLE_VBOX_CHAT);
-	}
-	
-	private void setTextFieldKeyPressedBehavior() {
-		chatTextField.setOnKeyPressed(new EventHandler<KeyEvent>(){
-			
-	        @Override
-	        public void handle(KeyEvent key){
-	            if (key.getCode().equals(KeyCode.ENTER) && chatTextField.getText().length()>0){
-	            	// Send Messages
-			        Label txt = new Label("");
-			        txt.setText(chatTextField.getText()+ChatConstants.SPACE_FOR_LABEL_TIME);
-			        txt.setWrapText(true);
-			        txt.setTextFill(ChatConstants.COLOR_LABEL_TEXT_SEND);
-			        txt.setStyle(ChatConstants.STYLE_LABEL_TEXT_SEND);
-			        txt.setPadding(ChatConstants.PADDING_LABEL_TEXT_SEND);
-			        txt.setAlignment(ChatConstants.ALIGNMENT_LABEL_TEXT_SEND);
-			        
-			        Label time = new Label(new SimpleDateFormat(ChatConstants.LABEL_TIME_SIMPLE_DATE_FORMAT).format(new Date()));
-			        time.setFont(ChatConstants.LABEL_TIME_FONT);
-			        time.setPadding(ChatConstants.PADDING_LABEL_TIME);
-			        time.setTextAlignment(ChatConstants.TEXT_ALIGNMENT_LABEL_TIME);
-			        
-			        StackPane sp = new StackPane();
-			        sp.setPadding(ChatConstants.PADDING_STACK_PANE_SEND);
-			        sp.getChildren().add(txt);
-			        sp.getChildren().add(time);
-			        StackPane.setAlignment(txt, ChatConstants.ALIGNMENT_STACK_PANE_SEND);
-			        StackPane.setAlignment(time, ChatConstants.ALIGNMENT_STACK_PANE_LABEL_TIME);
-			        
-			        // Send Local
-			        soundUtils.playSendSound();
-	                chatVBoxOnScroll.getChildren().addAll(sp);
-	                
-	                // Find the width and height of the component before the Stage has been shown
-	                chatVBoxOnScroll.applyCss();
-	                chatVBoxOnScroll.layout();
-	                
-	                // Limit the component height
-	                sp.setMinHeight(sp.getHeight());
-	                
-	                // Send Remote
-	                p2p.send_chat_msg_call(chatTextField.getText());
-	                if (mom.getNickname().equals("a")) {
-	                	mom.send("b", chatTextField.getText());
-	                }else {
-	                	mom.send("a", chatTextField.getText());
-	                }
-	                
-	                chatTextField.setText("");
-	            }
-	        }
-	        
-	    });
 	}
 	
 	private void setVBoxScrollsBehavior() {
@@ -193,4 +109,102 @@ public class ChatController extends Thread implements Initializable  {
 		});
 	}
 	
+	private void setTextFieldKeyPressedBehavior() {
+		chatTextField.setOnKeyPressed(new EventHandler<KeyEvent>(){
+			
+	        @Override
+	        public void handle(KeyEvent key){
+	            if (key.getCode().equals(KeyCode.ENTER) && chatTextField.getText().length()>0){
+	            	// Get text
+	            	String message_send = chatTextField.getText();
+	            			
+	            	// Send Locally
+	            	updateChatOnSend(message_send);
+	            	
+	                // Send Remotely
+	                p2p.send_chat_msg_call(message_send);
+	                if (mom.getNickname().equals("a")) {
+	                	mom.send("b", message_send);
+	                }else {
+	                	mom.send("a", message_send);
+	                }
+	            }
+	        }
+	        
+	    });
+	}
+	
+	private void updateChatOnSend(String text_message) {
+    	// Update chat components
+        Label txt = new Label("");
+        txt.setText(text_message+ChatConstants.SPACE_FOR_LABEL_TIME);
+        txt.setWrapText(true);
+        txt.setTextFill(ChatConstants.COLOR_LABEL_TEXT_SEND);
+        txt.setStyle(ChatConstants.STYLE_LABEL_TEXT_SEND);
+        txt.setPadding(ChatConstants.PADDING_LABEL_TEXT_SEND);
+        txt.setAlignment(ChatConstants.ALIGNMENT_LABEL_TEXT_SEND);
+        
+        Label time = new Label(new SimpleDateFormat(ChatConstants.LABEL_TIME_SIMPLE_DATE_FORMAT).format(new Date()));
+        time.setFont(ChatConstants.LABEL_TIME_FONT);
+        time.setPadding(ChatConstants.PADDING_LABEL_TIME);
+        time.setTextAlignment(ChatConstants.TEXT_ALIGNMENT_LABEL_TIME);
+        
+        StackPane sp = new StackPane();
+        sp.setPadding(ChatConstants.PADDING_STACK_PANE_SEND);
+        sp.getChildren().add(txt);
+        sp.getChildren().add(time);
+        StackPane.setAlignment(txt, ChatConstants.ALIGNMENT_STACK_PANE_SEND);
+        StackPane.setAlignment(time, ChatConstants.ALIGNMENT_STACK_PANE_LABEL_TIME);
+        
+        // Send Locally
+        soundUtils.playSendSound();
+        chatVBoxOnScroll.getChildren().addAll(sp);
+        
+        // Find the width and height of the component before the Stage has been shown
+        chatVBoxOnScroll.applyCss();
+        chatVBoxOnScroll.layout();
+        
+        // Limit the component height
+        sp.setMinHeight(sp.getHeight());
+        
+        // Clean chatTextField
+        chatTextField.setText("");
+	}
+	
+	private void updateChatOnReceive(String text_message) {
+    	// Update chat components
+		Label txt = new Label("");
+        txt.setText(text_message+ChatConstants.SPACE_FOR_LABEL_TIME);
+        txt.setWrapText(true);
+        txt.setTextFill(ChatConstants.COLOR_LABEL_TEXT_RECEIVE);
+        txt.setStyle(ChatConstants.STYLE_LABEL_TEXT_RECEIVE);
+        txt.setPadding(ChatConstants.PADDING_LABEL_TEXT_RECEIVE);
+        txt.setAlignment(ChatConstants.ALIGNMENT_LABEL_TEXT_RECEIVE);
+    	
+        Label time = new Label(new SimpleDateFormat(ChatConstants.LABEL_TIME_SIMPLE_DATE_FORMAT).format(new Date()));
+        time.setFont(ChatConstants.LABEL_TIME_FONT);
+        time.setPadding(ChatConstants.PADDING_LABEL_TIME);
+        time.setTextAlignment(ChatConstants.TEXT_ALIGNMENT_LABEL_TIME);
+        
+        StackPane sp = new StackPane();
+        sp.setPadding(ChatConstants.PADDING_STACK_PANE_RECEIVE);
+        sp.getChildren().add(txt);
+        sp.getChildren().add(time);
+        StackPane.setAlignment(txt, ChatConstants.ALIGNMENT_STACK_PANE_RECEIVE);
+        StackPane.setAlignment(time, ChatConstants.ALIGNMENT_STACK_PANE_LABEL_TIME);
+        
+        // Receive Locally
+        soundUtils.playReceiveSound();
+		chatVBoxOnScroll.getChildren().addAll(sp);
+		
+		// Find the width and height of the component before the Stage has been shown
+		chatVBoxOnScroll.applyCss();
+		chatVBoxOnScroll.layout();
+        
+        // Limit the component height
+        sp.setMinHeight(sp.getHeight());
+        
+        // Adjust width of time label through padding
+        time.setPadding(new Insets(0,sp.getWidth()-txt.getWidth()+6,2,0));
+	}
 }
