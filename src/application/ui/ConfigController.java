@@ -11,7 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 
-public class ContactsController implements Initializable  {
+public class ConfigController extends Thread implements Initializable  {
 	
 	// FXML Variables
 	@FXML VBox mainVBox;
@@ -33,6 +33,11 @@ public class ContactsController implements Initializable  {
 		on_circle.setFill(javafx.scene.paint.Color.GRAY);
 		off_circle.setFill(javafx.scene.paint.Color.RED);
 		setPowerBtnPressedBehavior();
+	}
+	
+	@Override
+	public void run() {
+		return;
 	}
 	
 	private void setPowerBtnPressedBehavior() {

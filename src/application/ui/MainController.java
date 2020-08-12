@@ -29,12 +29,12 @@ public class MainController implements Initializable {
 	private P2P p2p;
 	
 	// FXML Loaders
-	private FXMLLoader contactsLoader;
 	private FXMLLoader chatLoader;
+	private FXMLLoader configLoader;
 	
 	// Controllers
-	private ContactsController contactsController;
 	private ChatController chatController;
+	private ConfigController configController;
 	
 	// Main Object
 	private Main main;
@@ -48,34 +48,34 @@ public class MainController implements Initializable {
 		mom = new MOM();
 		p2p = new P2P();
 		
-		Scene contactsScene = null;
 		Scene chatScene = null;
+		Scene configScene = null;
 		
-		contactsLoader = new FXMLLoader(getClass().getResource(FXMLConstants.FXML_CONTACTS_CONTROLLER));
 		chatLoader = new FXMLLoader(getClass().getResource(FXMLConstants.FXML_CHAT_CONTROLLER));
+		configLoader = new FXMLLoader(getClass().getResource(FXMLConstants.FXML_CONFIG_CONTROLLER));
 		
 		//Load Scenes
 		try {
-			contactsScene = new Scene(contactsLoader.load());
 			chatScene = new Scene(chatLoader.load());
+			configScene = new Scene(configLoader.load());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		// Add nodes to MainController holders 
-		mainHBox.getChildren().add(contactsScene.getRoot());
+		mainHBox.getChildren().add(configScene.getRoot());
 		mainHBox.getChildren().add(chatScene.getRoot());
 		
 		// Get Controller
-		contactsController = contactsLoader.getController();
 		chatController = chatLoader.getController();
+		configController = configLoader.getController();
 		
 		// Authentication
 		authentication();
 		
 		// Load common objects from parent
-		contactsController.loadFromParent(mom, p2p);
 		chatController.loadFromParent(mom, p2p);
+		configController.loadFromParent(mom, p2p);
 	}
 	
 	public void closeApplication() {
@@ -87,9 +87,9 @@ public class MainController implements Initializable {
         Scene scene;
         Stage popupStage;
         FXMLLoader loader = new FXMLLoader();
-        PopupAuthController popupController = new PopupAuthController(mom, p2p, contactsController, chatController);
+        AuthController popupController = new AuthController(mom, p2p, chatController, configController);
         
-        loader.setLocation(getClass().getResource(FXMLConstants.FXML_POPUP_AUTH_CONTROLLER));
+        loader.setLocation(getClass().getResource(FXMLConstants.FXML_AUTH_CONTROLLER));
         loader.setController(popupController);
         
         try {

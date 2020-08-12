@@ -8,14 +8,13 @@ import application.com.P2P;
 import application.com.P2PConstants;
 import application.com.mom.MOM;
 import application.ui.constants.PopupAuthConstants;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class PopupAuthController implements Initializable {
+public class AuthController implements Initializable {
 
 	// FXML Variables
     @FXML private TextField nicknameTF;
@@ -31,14 +30,14 @@ public class PopupAuthController implements Initializable {
     private Stage stage = null;
     private HashMap<String, String> credentials = new HashMap<String, String>();
     
-    private ContactsController contacts;
     private ChatController chat;
+    private ConfigController config;
     
-    public PopupAuthController(MOM mom, P2P p2p, ContactsController contacts, ChatController chat) {
+    public AuthController(MOM mom, P2P p2p, ChatController chat, ConfigController config) {
     	this.mom = mom;
     	this.p2p = p2p;
-    	this.contacts = contacts;
     	this.chat = chat;
+    	this.config = config;
     }
     
     @Override
@@ -46,6 +45,18 @@ public class PopupAuthController implements Initializable {
     	setEnterBtnPressedBehavior();
     }
 	
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+    
+    private void closeStage() {
+    	chat.start();
+    	config.start();
+        if(stage!=null) {
+            stage.close();
+        }
+    }
+    
     private void setEnterBtnPressedBehavior() {
     	enterButton.setOnAction((event)->{
         	disableComponents(true);
@@ -91,16 +102,4 @@ public class PopupAuthController implements Initializable {
     	}
     	return;
     }
-    
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-    
-    private void closeStage() {
-    	chat.start();
-        if(stage!=null) {
-            stage.close();
-        }
-    }
-
 }
