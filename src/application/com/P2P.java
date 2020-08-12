@@ -193,11 +193,20 @@ public class P2P implements P2PInterface {
 			return false;
 		}
 	}
-
+	
 	@Override
-	public Boolean has_connection() {
+	public Boolean is_active() {
 		if(technology!=null) {
-			return this.technology.has_connection();
+			return this.technology.is_active();
+		}else {
+			return false;
+		}
+	}
+	
+	@Override
+	public Boolean is_connected() {
+		if(technology!=null) {
+			return this.technology.is_connected();
 		}else {
 			return false;
 		}

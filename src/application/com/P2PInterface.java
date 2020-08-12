@@ -21,7 +21,8 @@ public interface P2PInterface {
 	public Integer get_port_number();
 	public Boolean is_server();
 	public Boolean is_client();
-	public Boolean has_connection();
+	public Boolean is_active();
+	public Boolean is_connected();
 	
 	// Chat Stack Full
 	public Boolean chat_stack_full();

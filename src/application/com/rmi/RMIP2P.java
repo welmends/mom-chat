@@ -13,14 +13,14 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	private static final long serialVersionUID = 0L;
 	private static RMIP2PInterface rmi_client;
 	
-	private Semaphore mutex;
+	private Semaphore status_mutex, chat_mutex;
 	
     private String server_link, client_link;
     
     private String chat_msg;
     private Boolean chat_stack_full;
     
-    private Boolean is_active, is_connected;
+    private Boolean active_status, connect_status;
     private String peer_type;
     private String ip, local_ip;
     private int port;
@@ -28,15 +28,16 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	public RMIP2P() throws RemoteException{
 		super();
 		
-		this.mutex = new Semaphore(1);
+		this.status_mutex = new Semaphore(1);
+		this.chat_mutex = new Semaphore(1);
 		
 		this.server_link = "";
 		this.client_link = "";
 		
 		this.chat_stack_full = false;
 		
-		this.is_active = false;
-		this.is_connected = false;
+		this.active_status = false;
+		this.connect_status = false;
 		this.peer_type = "";
 		this.ip = "";
 		this.local_ip = "";
@@ -75,6 +76,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
         	int length = Naming.list(server_link).length;
         	if(length==0) {
     			peer_type = "server";
+    			set_active_status(true);
     			bind();
     			return true;
     		}
@@ -99,12 +101,15 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public Boolean disconnect() {
 		try {
-			is_active = false;
-			is_connected = false;
+			Boolean status = is_connected();
+			set_active_status(false);
+			set_connect_status(false);
 			unbind();
-			RMIP2P.rmi_client.call_peer_disconnect();
+			if(status) {
+				RMIP2P.rmi_client.call_peer_disconnect();
+			}
 			return true;
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			System.out.println("[rmi][disconnect method]");
 			System.out.println(e);
 			return false;
@@ -122,17 +127,13 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		try {
             while(true){
             	Thread.sleep(P2PConstants.THREAD_SLEEP_TIME_MILLIS);
-            	mutex.acquire();
-            	if(is_active == false) {
-            		mutex.release();
+            	if(is_active() == false) {
             		return;
             	}
-            	else if(is_connected == false) {
-            		mutex.release();
-            		throw new Exception("peer disconnected");
+            	else if(is_connected() == false) {
+            		throw new Exception("peer disconnect_status");
             	}
             	else {
-            		mutex.release();
             		RMIP2P.rmi_client.call_peer_test_connection();
             	}
             }
@@ -176,22 +177,69 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     }
     
 	@Override
-    public Boolean has_connection() {
-    	return is_connected;
+    public Boolean is_active() {
+		Boolean status = false;
+		try {
+			status_mutex.acquire();
+			status = active_status;
+			status_mutex.release();
+			return status;
+		} catch (Exception e) {
+			System.out.println("[rmi][is_active method]");
+			System.out.println(e);
+			return false;
+		}
     }
-    
+
+	@Override
+    public Boolean is_connected() {
+		Boolean status = false;
+		try {
+			status_mutex.acquire();
+			status = connect_status;
+			status_mutex.release();
+			return status;
+		} catch (Exception e) {
+			System.out.println("[rmi][is_connected method]");
+			System.out.println(e);
+			return false;
+		}
+    }
+	
+	public void set_active_status(Boolean status) {
+		try {
+			status_mutex.acquire();
+			active_status = status;
+			status_mutex.release();
+		} catch (Exception e) {
+			System.out.println("[rmi][set_active method]");
+			System.out.println(e);
+		}
+	}
+	
+	public void set_connect_status(Boolean status) {
+		try {
+			status_mutex.acquire();
+			connect_status = status;
+			status_mutex.release();
+		} catch (Exception e) {
+			System.out.println("[rmi][set_active method]");
+			System.out.println(e);
+		}
+	}
+	
     // P2P Interface Implementation - Chat Stack Full
 	@Override
     public Boolean chat_stack_full() {
     	Boolean stack_full = false;
-		if(is_connected==false) {
+		if(is_connected()==false) {
 			return stack_full;
 		}
 		try {
-			mutex.acquire();
+			chat_mutex.acquire();
 			stack_full = chat_stack_full;
 			if(stack_full == true) { chat_stack_full = false; }
-	    	mutex.release();
+			chat_mutex.release();
 		} catch (Exception e) {
 			System.out.println("[rmi][chat_stack_full method]");
 			System.out.println(e);
@@ -208,7 +256,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	// P2P Interface Implementation - Calls
 	@Override
 	public void send_chat_msg_call(String msg) {
-		if(is_connected==false) {
+		if(is_connected()==false) {
 			return;
 		}
 		try {
@@ -224,9 +272,9 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	public void send_chat_msg(String msg) {
 		chat_msg = msg;
 		try {
-			mutex.acquire();
+			chat_mutex.acquire();
 			chat_stack_full = true;
-	    	mutex.release();
+			chat_mutex.release();
 		} catch (Exception e) {
 			System.out.println("[rmi][send_chat_msg method]");
 			System.out.println(e);
@@ -242,7 +290,12 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	
 	@Override
 	public void call_peer_disconnect() {
-		is_connected = false;
+		try {
+			set_connect_status(false);
+		} catch (Exception e) {
+			System.out.println("[rmi][call_peer_disconnect method]");
+			System.out.println(e);
+		}
 		unbind();
 	}
 	
@@ -276,8 +329,8 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	private Boolean lookup() {
 		try {
 			rmi_client = (RMIP2PInterface)Naming.lookup(client_link);
-			is_active = true;
-			is_connected = true;
+			set_active_status(true);
+			set_connect_status(true);
 			new Thread(this).start();
 			return true;
 		} catch(Exception e){

@@ -42,7 +42,7 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	private void setPowerBtnPressedBehavior() {
 		power_btn.setOnAction((event)->{
-        	if (p2p.has_connection()) {
+        	if (p2p.is_active()) {
         		if(p2p.disconnect()) {
             		on_circle.setFill(javafx.scene.paint.Color.GRAY);
             		off_circle.setFill(javafx.scene.paint.Color.RED);
