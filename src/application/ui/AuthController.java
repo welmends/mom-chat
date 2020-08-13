@@ -64,7 +64,7 @@ public class AuthController implements Initializable {
         	String nickname     = credentials.get(AuthConstants.HASHCODE_NICKNAME);
         	String ip_address   = credentials.get(AuthConstants.HASHCODE_IPADDRESS);
         	Integer port_number = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER));
-        	String mom_url      = "tcp://"+ip_address+":61616";
+        	String mom_url      = AuthConstants.MOM_URL_HEADER + ip_address + AuthConstants.MOM_DEFAULT_PORT;
         	
         	// MOM Connection
         	mom.setup(mom_url, nickname);
