@@ -42,9 +42,7 @@ public class ConfigController extends Thread implements Initializable  {
 	private ChatController chat;
 	
 	// Variables
-	private List<String> contactsNicknames;
 	private List<Button> contactsButtons;
-	private List<Circle> contactsCircles;
 	
 	public void loadFromParent(MOM mom, HashMap<String, P2P> p2ps, ChatController chat) {
 		this.mom = mom;
@@ -55,9 +53,7 @@ public class ConfigController extends Thread implements Initializable  {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
-		contactsNicknames = new ArrayList<String>();
 		contactsButtons   = new ArrayList<Button>();
-		contactsCircles   = new ArrayList<Circle>();
 		
 		setupComponents();
 		setAddBtnPressedBehavior();
@@ -86,28 +82,16 @@ public class ConfigController extends Thread implements Initializable  {
 			p2ps.get(new_contact_nickname).set_technology(P2PConstants.RMI);
 			
 			HBox h = new HBox();
-			VBox v = new VBox();
 			Button b = new Button();
-			Circle c = new Circle();
-			
-			c.setRadius(ConfigConstants.CICLE_STATUS_RADIUS);
-			c.setStrokeWidth(ConfigConstants.CICLE_STATUS_STROKE);
-			c.setStroke(ConfigConstants.COLOR_STROKE);
-			c.setFill(ConfigConstants.COLOR_UNKNOWN);
 			
 			b.setText(new_contact_nickname);
 			b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
 			setContactBtnPressedBehavior(b);
 			
-			v.getChildren().add(c);
-			v.setPadding(ConfigConstants.PADDING_CONTACT_CIRCLE_VBOX);
-			
 			h.setPadding(ConfigConstants.PADDING_CONTACT_HBOX);
-			h.getChildren().addAll(b, v);
+			h.getChildren().addAll(b);
 			
-			contactsNicknames.add(new_contact_nickname);
 			contactsButtons.add(b);
-			contactsCircles.add(c);
 
 	        contactsVBoxOnScroll.getChildren().addAll(h);
 	        contactsVBoxOnScroll.applyCss();
@@ -126,8 +110,7 @@ public class ConfigController extends Thread implements Initializable  {
     		// Select contact
 			for (int i=0; i<contactsButtons.size(); i++) {
 				if(contactsButtons.get(i).equals(b)) {
-					contactsCircles.get(i).setFill(ConfigConstants.COLOR_ONLINE);
-					mom.set_contact_nickname(contactsNicknames.get(i));
+					mom.set_contact_nickname(contactsButtons.get(i).getText());
 					chat.chatLabel.setText(mom.get_contact_nickname());
 					chat.clearChat();
 					//***Loads chat history
@@ -144,7 +127,11 @@ public class ConfigController extends Thread implements Initializable  {
 		power_btn.setOnAction((event)->{
         	if (mom.is__online()) {
         		getOffline();
-        		p2ps.get(mom.get_contact_nickname()).disconnect();
+        		try {
+        			p2ps.get(mom.get_contact_nickname()).disconnect();	
+        		} catch (Exception e){
+        			
+        		}
         	} else {
         		getOnline();
         	}
