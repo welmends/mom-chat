@@ -78,33 +78,28 @@ public class ChatController extends Thread implements Initializable  {
 				continue;
 			}
 			
-			if(p2ps.get(mom.get_contact_nickname()).is_connected() && p2ps.get(mom.get_contact_nickname()).was_retrieved()==false) {
-				p2ps.get(mom.get_contact_nickname()).set_retrieve_status(true);
-            	// Receive enqueued messages from MOM
-				List<String> queue = mom.receiveQueue();
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-				        // Receive Locally
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					String key = mom.get_contact_nickname();
+					P2P p2p = p2ps.get(key);
+					
+					if(p2p.is_connected() && p2p.was_retrieved()==false) {
+						p2p.set_retrieve_status(true);
+		            	// Receive enqueued messages from MOM
+						List<String> queue = mom.receiveQueue();
 						for (int i=0; i<queue.size(); i++) {
 							updateChatOnReceive(queue.get(i));
 						}
 						queue.clear();
 					}
-				});
-			}
-			else if(p2ps.get(mom.get_contact_nickname()).chat_stack_full()) {
-				// Receive Remote 
-				String message_received = p2ps.get(mom.get_contact_nickname()).get_chat_msg();
-				
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-				        // Receive Locally
+					else if(p2p.chat_stack_full()) {
+						// Receive Remotely
+						String message_received = p2p.get_chat_msg();
 						updateChatOnReceive(message_received);
 					}
-				});
-			}
+				}
+			});
 		}
 	}
 	
