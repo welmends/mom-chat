@@ -20,7 +20,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     private String chat_msg;
     private Boolean chat_stack_full;
     
-    private Boolean active_status, connect_status, retrieve_status;
+    private Boolean connect_status, retrieve_status;
     private String peer_type;
     private String id;
     private String ip, local_ip;
@@ -37,7 +37,6 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		
 		this.chat_stack_full = false;
 		
-		this.active_status = false;
 		this.connect_status = false;
 		this.retrieve_status = false;
 		
@@ -82,7 +81,6 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
         	int length = Naming.list(server_link).length;
         	if(length==0) {
     			peer_type = "server";
-    			set_active_status(true);
     			bind();
     			return true;
     		}
@@ -107,7 +105,6 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public Boolean disconnect() {
 		try {
-			set_active_status(false);
 			set_connect_status(false);
 			set_retrieve_status(false);
 			try {
@@ -135,10 +132,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		try {
             while(true){
             	Thread.sleep(P2PConstants.THREAD_SLEEP_TIME_MILLIS);
-            	if(is_active() == false) {
-            		return;
-            	}
-            	else if(is_connected() == false) {
+            	if(is_connected() == false) {
             		throw new Exception("peer disconnect_status");
             	}
             	else {
@@ -188,22 +182,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     	}
     	return false;
     }
-    
-	@Override
-    public Boolean is_active() {
-		Boolean status = false;
-		try {
-			status_mutex.acquire();
-			status = active_status;
-			status_mutex.release();
-			return status;
-		} catch (Exception e) {
-			System.out.println("[rmi][is_active method]");
-			System.out.println(e);
-			return false;
-		}
-    }
-
+	
 	@Override
     public Boolean is_connected() {
 		Boolean status = false;
@@ -235,18 +214,6 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     }
 	
  	// P2P Interface Implementation - Setters
-	@Override
-	public void set_active_status(Boolean status) {
-		try {
-			status_mutex.acquire();
-			active_status = status;
-			status_mutex.release();
-		} catch (Exception e) {
-			System.out.println("[rmi][set_active_status method]");
-			System.out.println(e);
-		}
-	}
-	
 	@Override
 	public void set_connect_status(Boolean status) {
 		try {
@@ -373,7 +340,6 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	private Boolean lookup() {
 		try {
 			rmi_client = (RMIP2PInterface)Naming.lookup(client_link);
-			set_active_status(true);
 			set_connect_status(true);
 			new Thread(this).start();
 			return true;

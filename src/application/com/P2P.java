@@ -208,15 +208,6 @@ public class P2P implements P2PInterface {
 	}
 	
 	@Override
-	public Boolean is_active() {
-		if(technology!=null) {
-			return this.technology.is_active();
-		}else {
-			return false;
-		}
-	}
-	
-	@Override
 	public Boolean is_connected() {
 		if(technology!=null) {
 			return this.technology.is_connected();
@@ -235,12 +226,6 @@ public class P2P implements P2PInterface {
 	}
 
  	// P2P Interface Implementation - Setters
-	public void set_active_status(Boolean status) {
-		if(technology!=null) {
-			this.technology.set_active_status(status);
-		}
-	}
-	
 	public void set_connect_status(Boolean status) {
 		if(technology!=null) {
 			this.technology.set_connect_status(status);
