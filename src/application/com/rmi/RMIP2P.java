@@ -360,7 +360,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	private Boolean unbind() {
 		try {
 			Naming.unbind(server_link);
-			UnicastRemoteObject.unexportObject(this, false);
+			UnicastRemoteObject.unexportObject(rmi_client, false);
 			return true;
 		} catch(Exception e){
 			System.out.println("[rmi][unbind method]");
