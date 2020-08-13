@@ -112,6 +112,8 @@ public class ConfigController extends Thread implements Initializable  {
 	        contactsVBoxOnScroll.getChildren().addAll(h);
 	        contactsVBoxOnScroll.applyCss();
 	        contactsVBoxOnScroll.layout();
+	        
+	        add_tf.setText("");
         });
     }
 	
