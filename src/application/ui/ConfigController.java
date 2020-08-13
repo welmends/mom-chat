@@ -130,11 +130,14 @@ public class ConfigController extends Thread implements Initializable  {
         		getOffline();
         		try {
         			p2ps.get(mom.get_contact_nickname()).disconnect();	
-        		} catch (Exception e){
-        			
-        		}
+        		} catch (Exception e){}
         	} else {
         		getOnline();
+        		try {
+					if (p2ps.containsKey(mom.get_contact_nickname()) && !p2ps.get(mom.get_contact_nickname()).is_connected()) {
+						p2ps.get(mom.get_contact_nickname()).connect();
+					}
+        		} catch (Exception e){}
         	}
         });
     }

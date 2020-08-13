@@ -9,6 +9,8 @@ import application.Main;
 import application.com.P2P;
 import application.com.mom.MOM;
 import application.ui.constants.FXMLConstants;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,6 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class MainController implements Initializable {
 	
@@ -91,7 +94,7 @@ public class MainController implements Initializable {
     private Boolean authentication() {
         Parent layout;
         Scene scene;
-        Stage popupStage;
+        Stage auth_stage;
         FXMLLoader loader = new FXMLLoader();
         AuthController popupController = new AuthController(mom, chatController, configController);
         
@@ -101,12 +104,19 @@ public class MainController implements Initializable {
         try {
             layout = loader.load();
             scene = new Scene(layout);
-            popupStage = new Stage();
-            popupController.setStage(popupStage);
-            if(this.main!=null) { popupStage.initOwner(this.main.getPrimaryStage()); }
-            popupStage.initModality(Modality.WINDOW_MODAL);
-            popupStage.setScene(scene);
-            popupStage.showAndWait();
+            auth_stage = new Stage();
+            popupController.setStage(auth_stage);
+            if(this.main!=null) { auth_stage.initOwner(this.main.getPrimaryStage()); }
+            auth_stage.initModality(Modality.WINDOW_MODAL);
+            auth_stage.setResizable(false);
+            auth_stage.setScene(scene);
+            auth_stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+    		    @Override public void handle(WindowEvent t) {
+    		        Platform.exit();
+    		        System.exit(0);
+    		    }
+    		});
+            auth_stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
