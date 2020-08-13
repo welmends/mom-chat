@@ -43,7 +43,7 @@
             <Insets top="10.0" />
          </VBox.margin>
          <children>
-            <TextField fx:id="chatTextField" prefHeight="40.0" prefWidth="480.0">
+            <TextField fx:id="chatTextField" prefHeight="40.0" prefWidth="480.0" promptText="Type a message">
                <font>
                   <Font size="16.0" />
                </font>
