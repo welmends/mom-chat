@@ -107,12 +107,13 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public Boolean disconnect() {
 		try {
-			Boolean status = is_connected();
 			set_active_status(false);
 			set_connect_status(false);
 			set_retrieve_status(false);
-			if(status) {
+			try {
 				RMIP2P.rmi_client.call_peer_disconnect();
+			} catch (Exception e) {
+				System.out.println(e);
 			}
 			unbind();
 			return true;

@@ -120,7 +120,7 @@ public class ConfigController extends Thread implements Initializable  {
 	private void setContactBtnPressedBehavior(Button b) {
 		b.setOnAction((event)->{
 			// Disconnect
-			if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname()) && p2ps.get(mom.get_contact_nickname()).is_connected()) {
+			if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname())) {
 				p2ps.get(mom.get_contact_nickname()).disconnect();
         	}
     		// Select contact
@@ -144,11 +144,9 @@ public class ConfigController extends Thread implements Initializable  {
 		power_btn.setOnAction((event)->{
         	if (mom.is__online()) {
         		getOffline();
+        		p2ps.get(mom.get_contact_nickname()).disconnect();
         	} else {
         		getOnline();
-    			if (p2ps.containsKey(mom.get_contact_nickname()) && !p2ps.get(mom.get_contact_nickname()).is_connected()) {
-    				p2ps.get(mom.get_contact_nickname()).connect();
-            	}
         	}
         });
     }
