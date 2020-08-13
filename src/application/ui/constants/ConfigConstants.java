@@ -12,7 +12,7 @@ public class ConfigConstants {
 	
 	// Insets
 	public static Insets PADDING_CONTACT_HBOX = new Insets(2, 0, 2, 0);
-	public static Insets PADDING_CONTACT_VBOX = new Insets(8, 0, 0, 30);
+	public static Insets PADDING_CONTACT_CIRCLE_VBOX = new Insets(8, 0, 0, 30);
 	
 	// Buttons Attributes
 	public static Double CONTACT_BUTTON_PREF_WIDTH = 150.0;

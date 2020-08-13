@@ -2,7 +2,6 @@ package application.ui;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -14,8 +13,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -43,6 +40,7 @@ public class ConfigController extends Thread implements Initializable  {
 	private ChatController chat;
 	
 	// Variables
+	private List<String> contactsNicknames;
 	private List<Button> contactsButtons;
 	private List<Circle> contactsCircles;
 	
@@ -55,8 +53,9 @@ public class ConfigController extends Thread implements Initializable  {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
-		contactsButtons = new ArrayList<Button>();
-		contactsCircles = new ArrayList<Circle>();
+		contactsNicknames = new ArrayList<String>();
+		contactsButtons   = new ArrayList<Button>();
+		contactsCircles   = new ArrayList<Circle>();
 		
 		setupComponents();
 		setAddBtnPressedBehavior();
@@ -78,7 +77,9 @@ public class ConfigController extends Thread implements Initializable  {
 	}
 	
 	private void setAddBtnPressedBehavior() {
-		add_btn.setOnAction((event1)->{
+		add_btn.setOnAction((event)->{
+			String nickname = add_tf.getText();//*** Verify if its valid
+			
 			HBox h = new HBox();
 			VBox v = new VBox();
 			Button b = new Button();
@@ -89,23 +90,17 @@ public class ConfigController extends Thread implements Initializable  {
 			c.setStroke(ConfigConstants.COLOR_STROKE);
 			c.setFill(ConfigConstants.COLOR_UNKNOWN);
 			
-			b.setText(add_tf.getText());
+			b.setText(nickname);
 			b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
-			b.setOnAction((event2)->{
-				for (int i=0; i<contactsButtons.size(); i++) {
-					if(contactsButtons.get(i).equals(b)) {
-						chat.chatLabel.setText(contactsButtons.get(i).getText());
-						contactsCircles.get(i).setFill(ConfigConstants.COLOR_ONLINE);
-					}
-				}
-	        });
+			setContactBtnPressedBehavior(b);
 			
 			v.getChildren().add(c);
-			v.setPadding(ConfigConstants.PADDING_CONTACT_VBOX);
+			v.setPadding(ConfigConstants.PADDING_CONTACT_CIRCLE_VBOX);
 			
 			h.setPadding(ConfigConstants.PADDING_CONTACT_HBOX);
 			h.getChildren().addAll(b, v);
 			
+			contactsNicknames.add(nickname);
 			contactsButtons.add(b);
 			contactsCircles.add(c);
 
@@ -114,6 +109,17 @@ public class ConfigController extends Thread implements Initializable  {
 	        contactsVBoxOnScroll.layout();
         });
     }
+	
+	private void setContactBtnPressedBehavior(Button b) {
+		b.setOnAction((event)->{
+			for (int i=0; i<contactsButtons.size(); i++) {
+				if(contactsButtons.get(i).equals(b)) {
+					chat.chatLabel.setText(contactsButtons.get(i).getText());
+					contactsCircles.get(i).setFill(ConfigConstants.COLOR_ONLINE);
+				}
+			}
+        });
+	}
 	
 	private void setPowerBtnPressedBehavior() {
 		power_btn.setOnAction((event)->{
