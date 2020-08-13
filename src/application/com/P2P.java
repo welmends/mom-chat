@@ -13,12 +13,14 @@ public class P2P implements P2PInterface {
 	
 	private P2PInterface technology;
 	private String technology_name;
+	private String id;
 	private String ip, local_ip;
 	private int port;
 	
 	public P2P() {
 		technology = null;
 		this.technology_name = "";
+		this.id = "";
 		this.ip = "";
 		this.local_ip = "";
 		this.port = -1;
@@ -42,20 +44,22 @@ public class P2P implements P2PInterface {
 
  	// P2P Interface Implementation - Connection
 	@Override
-	public void setup(String ip, int port) {
+	public void setup(String id, String ip, int port) {
 		if(technology!=null) {
-			this.technology.setup(ip, port);
+			this.technology.setup(id, ip, port);
 		}else {
+			this.id = id;
 			this.ip = ip;
 			this.port = port;
 		}
 	}
 	
 	@Override
-	public void setup(String ip, String local_ip, int port) {
+	public void setup(String id, String ip, String local_ip, int port) {
 		if(technology!=null) {
-			this.technology.setup(ip, local_ip, port);
+			this.technology.setup(id, ip, local_ip, port);
 		}else {
+			this.id = id;
 			this.ip = ip;
 			this.local_ip = local_ip;
 			this.port = port;
@@ -81,7 +85,7 @@ public class P2P implements P2PInterface {
 			} catch (RemoteException e) {
 				System.out.println(e);
 			}
-			this.technology.setup(ip, local_ip, port);
+			this.technology.setup(id, ip, local_ip, port);
 			return this.technology.connect();
 		default:
 			return false;

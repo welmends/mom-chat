@@ -3,6 +3,7 @@ package application.ui;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -39,14 +40,14 @@ public class ChatController extends Thread implements Initializable  {
 	
 	// COM Variables
 	private MOM mom;
-	private P2P p2p;
+	private HashMap<String, P2P> p2ps;
 	
 	// Variables
 	private SoundUtils soundUtils;
 	
-	public void loadFromParent(MOM mom, P2P p2p) {
+	public void loadFromParent(MOM mom, HashMap<String, P2P> p2ps) {
 		this.mom = mom;
-		this.p2p = p2p;
+		this.p2ps = p2ps;
 	}
 	
 	@Override
@@ -73,8 +74,12 @@ public class ChatController extends Thread implements Initializable  {
 				e.printStackTrace();
 			}
 			
-			if(p2p.is_connected() && p2p.was_retrieved()==false) {
-				p2p.set_retrieve_status(true);
+			if(mom.is__online()==false || p2ps.size()==0) {
+				continue;
+			}
+			
+			if(p2ps.get(mom.get_contact_nickname()).is_connected() && p2ps.get(mom.get_contact_nickname()).was_retrieved()==false) {
+				p2ps.get(mom.get_contact_nickname()).set_retrieve_status(true);
             	// Receive enqueued messages from MOM
 				List<String> queue = mom.receiveQueue();
 				Platform.runLater(new Runnable() {
@@ -88,9 +93,9 @@ public class ChatController extends Thread implements Initializable  {
 					}
 				});
 			}
-			else if(p2p.chat_stack_full()) {
+			else if(p2ps.get(mom.get_contact_nickname()).chat_stack_full()) {
 				// Receive Remote 
-				String message_received = p2p.get_chat_msg();
+				String message_received = p2ps.get(mom.get_contact_nickname()).get_chat_msg();
 				
 				Platform.runLater(new Runnable() {
 					@Override
@@ -138,14 +143,10 @@ public class ChatController extends Thread implements Initializable  {
 	            	updateChatOnSend(message_send);
 	            	
 	                // Send Remotely
-	            	if (p2p.is_connected()) {
-	            		p2p.send_chat_msg_call(message_send);
+	            	if (mom.is__online()) {
+	            		p2ps.get(mom.get_contact_nickname()).send_chat_msg_call(message_send);
 	            	} else {
-		                if (mom.getNickname().equals("a")) {
-		                	mom.send("b", message_send);
-		                } else {
-		                	mom.send("a", message_send);
-		                }
+	            		mom.send(mom.get_contact_nickname(), message_send);
 	            	}
 	            }
 	        }
@@ -225,5 +226,9 @@ public class ChatController extends Thread implements Initializable  {
         
         // Adjust width of time label through padding
         time.setPadding(new Insets(0,sp.getWidth()-txt.getWidth()+6,2,0));
+	}
+	
+	public void clearChat() {
+		chatVBoxOnScroll.getChildren().clear();
 	}
 }

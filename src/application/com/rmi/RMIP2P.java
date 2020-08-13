@@ -22,6 +22,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     
     private Boolean active_status, connect_status, retrieve_status;
     private String peer_type;
+    private String id;
     private String ip, local_ip;
     private int port;
     
@@ -41,6 +42,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 		this.retrieve_status = false;
 		
 		this.peer_type = "";
+		this.id = "";
 		this.ip = "";
 		this.local_ip = "";
 		this.port = -1;
@@ -59,13 +61,15 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	
 	// P2P Interface Implementation - Connection
 	@Override
-	public void setup(String ip, int port) {
+	public void setup(String id, String ip, int port) {
+		this.id = id;
 		this.ip = ip;
 		this.port = port;
 	}
 	
 	@Override
-	public void setup(String ip, String local_ip, int port) {
+	public void setup(String id, String ip, String local_ip, int port) {
+		this.id = id;
 		this.ip = ip;
 		this.local_ip = local_ip;
 		this.port = port;
@@ -74,7 +78,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public Boolean connect() {
         try {
-        	server_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_SERVER_NAME;
+        	server_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+id+P2PConstants.CHAT_RMI_SERVER_NAME;
         	int length = Naming.list(server_link).length;
         	if(length==0) {
     			peer_type = "server";
@@ -84,8 +88,8 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     		}
         	else if(length==1) {
         		peer_type = "client";
-    			server_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_CLIENT_NAME;
-    			client_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_SERVER_NAME;
+    			server_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+id+P2PConstants.CHAT_RMI_CLIENT_NAME;
+    			client_link = "rmi://"+ip+":"+String.valueOf(port)+"/"+id+P2PConstants.CHAT_RMI_SERVER_NAME;
     			bind();
     			lookup();
     			RMIP2P.rmi_client.call_server_lookup(local_ip);
@@ -317,7 +321,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	@Override
 	public void call_server_lookup(String client_ip) {
 		local_ip = client_ip;
-		client_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+P2PConstants.CHAT_RMI_CLIENT_NAME;
+		client_link = "rmi://"+local_ip+":"+String.valueOf(port)+"/"+id+P2PConstants.CHAT_RMI_CLIENT_NAME;
 		lookup();
 	}
 	

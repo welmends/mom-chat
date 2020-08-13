@@ -4,8 +4,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
-import application.com.P2P;
-import application.com.P2PConstants;
 import application.com.mom.MOM;
 import application.ui.constants.AuthConstants;
 import javafx.fxml.FXML;
@@ -24,7 +22,6 @@ public class AuthController implements Initializable {
     
 	// COM Variables
     private MOM mom;
-	private P2P p2p;
 	
 	// Variables
     private Stage stage = null;
@@ -33,9 +30,8 @@ public class AuthController implements Initializable {
     private ChatController chat;
     private ConfigController config;
     
-    public AuthController(MOM mom, P2P p2p, ChatController chat, ConfigController config) {
+    public AuthController(MOM mom, ChatController chat, ConfigController config) {
     	this.mom = mom;
-    	this.p2p = p2p;
     	this.chat = chat;
     	this.config = config;
     }
@@ -66,12 +62,8 @@ public class AuthController implements Initializable {
         	Integer port_number = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER));
         	String mom_url      = AuthConstants.MOM_URL_HEADER + ip_address + AuthConstants.MOM_DEFAULT_PORT;
         	
-        	// MOM Connection
-        	mom.setup(mom_url, nickname);
+        	mom.setup(mom_url, nickname, ip_address, port_number);
         	
-        	// P2P Connection
-        	p2p.setup(ip_address, port_number);
-        	p2p.set_technology(P2PConstants.RMI);
         	closeStage();
         });
     }

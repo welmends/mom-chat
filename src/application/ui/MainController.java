@@ -2,6 +2,7 @@ package application.ui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import application.Main;
@@ -26,7 +27,7 @@ public class MainController implements Initializable {
 	
 	// COM Variables
 	private MOM mom;
-	private P2P p2p;
+	private HashMap<String, P2P> p2ps;
 	
 	// FXML Loaders
 	private FXMLLoader chatLoader;
@@ -46,7 +47,7 @@ public class MainController implements Initializable {
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
 		mom = new MOM();
-		p2p = new P2P();
+		p2ps = new HashMap<String, P2P>();
 		
 		Scene chatScene = null;
 		Scene configScene = null;
@@ -74,12 +75,14 @@ public class MainController implements Initializable {
 		authentication();
 		
 		// Load common objects from parent
-		chatController.loadFromParent(mom, p2p);
-		configController.loadFromParent(mom, p2p, chatController);
+		chatController.loadFromParent(mom, p2ps);
+		configController.loadFromParent(mom, p2ps, chatController);
 	}
 	
 	public void closeApplication() {
-		p2p.disconnect();
+        for (String key : p2ps.keySet()) {
+            p2ps.get(key).disconnect();
+        }
 	}
 
     private Boolean authentication() {
@@ -87,7 +90,7 @@ public class MainController implements Initializable {
         Scene scene;
         Stage popupStage;
         FXMLLoader loader = new FXMLLoader();
-        AuthController popupController = new AuthController(mom, p2p, chatController, configController);
+        AuthController popupController = new AuthController(mom, chatController, configController);
         
         loader.setLocation(getClass().getResource(FXMLConstants.FXML_AUTH_CONTROLLER));
         loader.setController(popupController);

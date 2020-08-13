@@ -7,8 +7,8 @@ public interface P2PInterface {
 	public String get_technology_name();
 	
 	// Connection
-	public void setup(String ip, int port);
-	public void setup(String ip, String local_ip, int port);
+	public void setup(String id, String ip, int port);
+	public void setup(String id, String ip, String local_ip, int port);
 	public Boolean connect();
 	public Boolean disconnect();
 	
