@@ -84,9 +84,6 @@ public class ConfigController extends Thread implements Initializable  {
 			p2ps.put(new_contact_nickname, new P2P());
 			p2ps.get(new_contact_nickname).setup(mount_rmi_name(mom.nickname, new_contact_nickname), mom.ip, mom.port);
 			p2ps.get(new_contact_nickname).set_technology(P2PConstants.RMI);
-			if(mom.is__online()) {
-				p2ps.get(new_contact_nickname).connect();
-			}
 			
 			HBox h = new HBox();
 			VBox v = new VBox();
@@ -120,8 +117,10 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	private void setContactBtnPressedBehavior(Button b) {
 		b.setOnAction((event)->{
-			// Get online
-			getOnline();
+			// Disconnect
+			if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname()) && p2ps.get(mom.get_contact_nickname()).is_connected()) {
+				p2ps.get(mom.get_contact_nickname()).disconnect();
+        	}
     		// Select contact
 			for (int i=0; i<contactsButtons.size(); i++) {
 				if(contactsButtons.get(i).equals(b)) {
@@ -130,6 +129,10 @@ public class ConfigController extends Thread implements Initializable  {
 					chat.chatLabel.setText(mom.get_contact_nickname());
 					chat.clearChat();
 					//***Loads chat history
+					// Connect
+					if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname())) {
+						p2ps.get(mom.get_contact_nickname()).connect();
+					}
 	        		break;
 				}
 			}
@@ -142,6 +145,9 @@ public class ConfigController extends Thread implements Initializable  {
         		getOffline();
         	} else {
         		getOnline();
+    			if (p2ps.containsKey(mom.get_contact_nickname())) {
+    				p2ps.get(mom.get_contact_nickname()).connect();
+            	}
         	}
         });
     }
@@ -163,10 +169,6 @@ public class ConfigController extends Thread implements Initializable  {
 		mom.set_online(true);
 		on_circle.setFill(ConfigConstants.COLOR_ONLINE);
 		off_circle.setFill(ConfigConstants.COLOR_UNKNOWN);
-		
-        for (String key : p2ps.keySet()) {
-            p2ps.get(key).connect();
-        }
 	}
 	
 	private void getOffline() {

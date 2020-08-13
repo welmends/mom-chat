@@ -80,9 +80,12 @@ public class MainController implements Initializable {
 	}
 	
 	public void closeApplication() {
-        for (String key : p2ps.keySet()) {
-            p2ps.get(key).disconnect();
-        }
+		if (mom.is__online()) {
+	        for (String key : p2ps.keySet()) {
+	            p2ps.get(key).disconnect();
+	        }
+	        mom.set_online(false);
+		}
 	}
 
     private Boolean authentication() {
