@@ -17,6 +17,7 @@ public interface P2PInterface {
 	
 	// Getters
 	public String get_peer_type();
+	public String get_id();
 	public String get_ip_address();
 	public Integer get_port_number();
 	public Boolean is_server();

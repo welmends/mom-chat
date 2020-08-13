@@ -137,9 +137,16 @@ public class ChatController extends Thread implements Initializable  {
 	            	updateChatOnSend(message_send);
 	            	
 	                // Send Remotely
+	    	        for (String key1 : p2ps.keySet()) {
+	    	            P2P p2p = p2ps.get(key1);
+	    	            System.out.print("("+p2p.is_connected()+"-"+p2p.get_id()+"---"+mom.is__online()+") ");
+	    	        }
+	    	        System.out.println();
 	            	if (mom.is__online() && p2ps.get(mom.get_contact_nickname()).is_connected()) {
+	            		System.out.println(mom.nickname+" -> "+mom.get_contact_nickname()+" (online - "+message_send+")");
 	            		p2ps.get(mom.get_contact_nickname()).send_chat_msg_call(message_send);
 	            	} else {
+	            		System.out.println(mom.nickname+" -> "+mom.get_contact_nickname()+" (offline - "+message_send+")");
 	            		mom.send(mom.get_contact_nickname(), message_send);
 	            	}
 	            }

@@ -163,6 +163,15 @@ public class P2P implements P2PInterface {
 	}
 	
 	@Override
+	public String get_id() {
+		if(technology!=null) {
+			return this.technology.get_id();
+		}else {
+			return "";
+		}
+	}
+	
+	@Override
 	public String get_ip_address() {
 		if(technology!=null) {
 			return this.technology.get_ip_address();

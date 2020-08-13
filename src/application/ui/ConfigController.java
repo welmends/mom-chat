@@ -126,19 +126,15 @@ public class ConfigController extends Thread implements Initializable  {
     		// Select contact
 			for (int i=0; i<contactsButtons.size(); i++) {
 				if(contactsButtons.get(i).equals(b)) {
-					if (mom.get_contact_nickname().equals(contactsNicknames.get(i))) {
-						break;
-					}else {
-						contactsCircles.get(i).setFill(ConfigConstants.COLOR_ONLINE);
-						mom.set_contact_nickname(contactsNicknames.get(i));
-						chat.chatLabel.setText(mom.get_contact_nickname());
-						chat.clearChat();
-						//***Loads chat history
-						if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname()) && !p2ps.get(mom.get_contact_nickname()).is_connected()) {
-							p2ps.get(mom.get_contact_nickname()).connect();
-						}
-		        		break;
+					contactsCircles.get(i).setFill(ConfigConstants.COLOR_ONLINE);
+					mom.set_contact_nickname(contactsNicknames.get(i));
+					chat.chatLabel.setText(mom.get_contact_nickname());
+					chat.clearChat();
+					//***Loads chat history
+					if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname()) && !p2ps.get(mom.get_contact_nickname()).is_connected()) {
+						p2ps.get(mom.get_contact_nickname()).connect();
 					}
+	        		break;
 				}
 			}
         });

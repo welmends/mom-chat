@@ -111,10 +111,10 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 			set_active_status(false);
 			set_connect_status(false);
 			set_retrieve_status(false);
-			unbind();
 			if(status) {
 				RMIP2P.rmi_client.call_peer_disconnect();
 			}
+			unbind();
 			return true;
 		} catch (Exception e) {
 			System.out.println("[rmi][disconnect method]");
@@ -157,6 +157,11 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
     	return peer_type;
     }
     
+	@Override
+	public String get_id() {
+		return id;
+	}
+	
 	@Override
 	public String get_ip_address() {
 		return local_ip;
@@ -355,6 +360,7 @@ public class RMIP2P extends UnicastRemoteObject implements P2PInterface, RMIP2PI
 	private Boolean unbind() {
 		try {
 			Naming.unbind(server_link);
+			UnicastRemoteObject.unexportObject(this, false);
 			return true;
 		} catch(Exception e){
 			System.out.println("[rmi][unbind method]");
