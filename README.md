@@ -27,4 +27,4 @@ Chat using Middleware Oriented Message (MOM) and RMI/RPC implemented in Java
 ## Screens
 
 #### Chat View
-![chat_view](https://user-images.githubusercontent.com/19287934/90143140-a0526580-dd53-11ea-8ce1-73c4614ad8a9.png)
+![chat_view](https://user-images.githubusercontent.com/19287934/90145400-3d160280-dd56-11ea-946c-a24190690d64.png)
