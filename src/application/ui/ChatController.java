@@ -12,6 +12,7 @@ import application.com.mom.MOM;
 import application.ui.constants.ChatConstants;
 import application.ui.constants.ImageConstants;
 import application.ui.utils.SoundUtils;
+import application.ui.utils.StorageMessages;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -44,6 +45,7 @@ public class ChatController extends Thread implements Initializable  {
 	
 	// Variables
 	private SoundUtils soundUtils;
+	private HashMap<String, StorageMessages> storage;
 	
 	public void loadFromParent(MOM mom, HashMap<String, P2P> p2ps) {
 		this.mom = mom;
@@ -54,6 +56,7 @@ public class ChatController extends Thread implements Initializable  {
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
 		this.soundUtils = new SoundUtils();
+		this.storage = new HashMap<String, StorageMessages>();
 		
 		// Setup components
 		setupComponents();
@@ -88,6 +91,12 @@ public class ChatController extends Thread implements Initializable  {
 							List<String> queue = mom.receiveQueue();
 							for (int i=0; i<queue.size(); i++) {
 								updateChatOnReceive(queue.get(i));
+								
+								// Store
+				            	if (!storage.containsKey(mom.get_contact_nickname())) {
+				            		storage.put(mom.get_contact_nickname(), new StorageMessages());
+				            	}
+				            	storage.get(mom.get_contact_nickname()).push_back(queue.get(i), "in");
 							}
 							queue.clear();
 						}
@@ -95,6 +104,12 @@ public class ChatController extends Thread implements Initializable  {
 							// Receive Remotely
 							String message_received = p2ps.get(mom.get_contact_nickname()).get_chat_msg();
 							updateChatOnReceive(message_received);
+							
+							// Store
+			            	if (!storage.containsKey(mom.get_contact_nickname())) {
+			            		storage.put(mom.get_contact_nickname(), new StorageMessages());
+			            	}
+			            	storage.get(mom.get_contact_nickname()).push_back(message_received, "in");
 						}
 					}
 				}
@@ -137,18 +152,17 @@ public class ChatController extends Thread implements Initializable  {
 	            	updateChatOnSend(message_send);
 	            	
 	                // Send Remotely
-	    	        for (String key1 : p2ps.keySet()) {
-	    	            P2P p2p = p2ps.get(key1);
-	    	            System.out.print("("+p2p.is_connected()+"-"+p2p.get_id()+"---"+mom.is__online()+") ");
-	    	        }
-	    	        System.out.println();
 	            	if (mom.is__online() && p2ps.get(mom.get_contact_nickname()).is_connected()) {
-	            		System.out.println(mom.nickname+" -> "+mom.get_contact_nickname()+" (online - "+message_send+")");
 	            		p2ps.get(mom.get_contact_nickname()).send_chat_msg_call(message_send);
 	            	} else {
-	            		System.out.println(mom.nickname+" -> "+mom.get_contact_nickname()+" (offline - "+message_send+")");
 	            		mom.send(mom.get_contact_nickname(), message_send);
 	            	}
+	            	
+	            	// Store
+	            	if (!storage.containsKey(mom.get_contact_nickname())) {
+	            		storage.put(mom.get_contact_nickname(), new StorageMessages());
+	            	}
+	            	storage.get(mom.get_contact_nickname()).push_back(message_send, "out");
 	            }
 	        }
 	        
@@ -231,5 +245,18 @@ public class ChatController extends Thread implements Initializable  {
 	
 	public void clearChat() {
 		chatVBoxOnScroll.getChildren().clear();
+	}
+	
+	public void loadChat() {
+		if(storage.containsKey(mom.get_contact_nickname())) {
+			StorageMessages stor = storage.get(mom.get_contact_nickname());
+			for (int i=0; i<stor.messages.size(); i++) {
+				if(stor.directions.get(i).equals("out")) {
+					updateChatOnSend(stor.messages.get(i));
+				} else {
+					updateChatOnReceive(stor.messages.get(i));
+				}
+			}
+		}
 	}
 }

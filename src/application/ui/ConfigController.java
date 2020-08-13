@@ -76,7 +76,7 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	private void setAddBtnPressedBehavior() {
 		add_btn.setOnAction((event)->{
-			String new_contact_nickname = add_tf.getText();//*** Verify if its valid
+			String new_contact_nickname = add_tf.getText();
 			p2ps.put(new_contact_nickname, new P2P());
 			p2ps.get(new_contact_nickname).setup(mount_rmi_name(mom.nickname, new_contact_nickname), mom.ip, mom.port);
 			p2ps.get(new_contact_nickname).set_technology(P2PConstants.RMI);
@@ -113,7 +113,8 @@ public class ConfigController extends Thread implements Initializable  {
 					mom.set_contact_nickname(contactsButtons.get(i).getText());
 					chat.chatLabel.setText(mom.get_contact_nickname());
 					chat.clearChat();
-					//***Loads chat history
+					chat.loadChat();
+					// Connect
 					if (mom.is__online() && p2ps.containsKey(mom.get_contact_nickname()) && !p2ps.get(mom.get_contact_nickname()).is_connected()) {
 						p2ps.get(mom.get_contact_nickname()).connect();
 					}
