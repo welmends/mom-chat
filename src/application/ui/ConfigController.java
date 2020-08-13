@@ -77,6 +77,10 @@ public class ConfigController extends Thread implements Initializable  {
 	private void setAddBtnPressedBehavior() {
 		add_btn.setOnAction((event)->{
 			String new_contact_nickname = add_tf.getText();
+			if(new_contact_nickname.equals("")) {
+				return;
+			}
+			
 			p2ps.put(new_contact_nickname, new P2P());
 			p2ps.get(new_contact_nickname).setup(mount_rmi_name(mom.nickname, new_contact_nickname), mom.ip, mom.port);
 			p2ps.get(new_contact_nickname).set_technology(P2PConstants.RMI);
