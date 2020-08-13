@@ -75,7 +75,7 @@ public class MainController implements Initializable {
 		
 		// Load common objects from parent
 		chatController.loadFromParent(mom, p2p);
-		configController.loadFromParent(mom, p2p);
+		configController.loadFromParent(mom, p2p, chatController);
 	}
 	
 	public void closeApplication() {

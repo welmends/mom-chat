@@ -104,6 +104,8 @@ public class ChatController extends Thread implements Initializable  {
 	}
 	
 	private void setupComponents() {
+		chatLabel.setStyle(ChatConstants.STYLE_CHAT_LABEL);
+		
 		chatImageView.setImage(ImageConstants.CHAT_TOP_ICON);
 		
 		chatScrollPane.setStyle(ChatConstants.STYLE_SCROLL_PANE_CHAT);

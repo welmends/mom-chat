@@ -1,30 +1,25 @@
 package application.ui;
 
-import java.awt.Insets;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
-
-import org.apache.activemq.store.jdbc.adapter.BlobJDBCAdapter;
 
 import application.com.P2P;
 import application.com.mom.MOM;
-import application.ui.constants.ChatConstants;
 import application.ui.constants.ConfigConstants;
 import application.ui.constants.ImageConstants;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 
@@ -44,13 +39,25 @@ public class ConfigController extends Thread implements Initializable  {
 	private MOM mom;
 	private P2P p2p;
 	
-	public void loadFromParent(MOM mom, P2P p2p) {
+	// Controllers
+	private ChatController chat;
+	
+	// Variables
+	private List<Button> contactsButtons;
+	private List<Circle> contactsCircles;
+	
+	public void loadFromParent(MOM mom, P2P p2p, ChatController chat) {
 		this.mom = mom;
 		this.p2p = p2p;
+		this.chat = chat;
 	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		// Initialize Objects
+		contactsButtons = new ArrayList<Button>();
+		contactsCircles = new ArrayList<Circle>();
+		
 		setupComponents();
 		setAddBtnPressedBehavior();
 		setPowerBtnPressedBehavior();
@@ -71,24 +78,36 @@ public class ConfigController extends Thread implements Initializable  {
 	}
 	
 	private void setAddBtnPressedBehavior() {
-		add_btn.setOnAction((event)->{
+		add_btn.setOnAction((event1)->{
 			HBox h = new HBox();
 			VBox v = new VBox();
 			Button b = new Button();
 			Circle c = new Circle();
 			
-			h.setPadding(ConfigConstants.PADDING_CONTACT_HBOX);
-			b.setText(add_tf.getText());
-			b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
 			c.setRadius(ConfigConstants.CICLE_STATUS_RADIUS);
 			c.setStrokeWidth(ConfigConstants.CICLE_STATUS_STROKE);
 			c.setStroke(ConfigConstants.COLOR_STROKE);
 			c.setFill(ConfigConstants.COLOR_UNKNOWN);
 			
+			b.setText(add_tf.getText());
+			b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
+			b.setOnAction((event2)->{
+				for (int i=0; i<contactsButtons.size(); i++) {
+					if(contactsButtons.get(i).equals(b)) {
+						chat.chatLabel.setText(contactsButtons.get(i).getText());
+						contactsCircles.get(i).setFill(ConfigConstants.COLOR_ONLINE);
+					}
+				}
+	        });
+			
 			v.getChildren().add(c);
 			v.setPadding(ConfigConstants.PADDING_CONTACT_VBOX);
 			
+			h.setPadding(ConfigConstants.PADDING_CONTACT_HBOX);
 			h.getChildren().addAll(b, v);
+			
+			contactsButtons.add(b);
+			contactsCircles.add(c);
 
 	        contactsVBoxOnScroll.getChildren().addAll(h);
 	        contactsVBoxOnScroll.applyCss();
